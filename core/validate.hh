@@ -1,15 +1,13 @@
 <?hh
 
-define( "TINYINT_MIN", -128 );                // for future reference
-define( "TINYINT_MAX",  127 );                // for future reference
-define( "SMALLINT_MIN", -32768 );             // for future reference
-define( "SMALLINT_MAX",  32767 );             // for future reference
-define( "MEDIUMINT_MIN", -8388608 );          // for future reference
-define( "MEDIUMINT_MAX",  8388607 );          // for future reference
-define( "INT_MIN", -2147483648 );
-define( "INT_MAX", 2147483647 );
-define( "BIGINT_MIN", -9223372036854775808 ); // for future reference
-define( "BIGINT_MAX", 9223372036854775807 );  // for future reference
+define('TINYINT_MIN', -128);                // for future reference
+define('TINYINT_MAX',  127);                // for future reference
+define('SMALLINT_MIN', -32768);             // for future reference
+define('SMALLINT_MAX',  32767);             // for future reference
+define('MEDIUMINT_MIN', -8388608);          // for future reference
+define('MEDIUMINT_MAX',  8388607);          // for future reference
+define('INT_MIN', -2147483648);
+define('INT_MAX', 2147483647);
 
 /**
  *  Basic validation
@@ -77,7 +75,7 @@ class CoreValidate<Konsolidate> extends Konsolidate
 	 */
 	function isNumber(mixed $value):bool
 	{
-		return is_numeric($value));
+		return is_numeric($value);
 	}
 
 	/**
@@ -119,7 +117,7 @@ class CoreValidate<Konsolidate> extends Konsolidate
 	 */
 	function isFilled(mixed $value):bool
 	{
-		return !preg_match('/^$/', $value));
+		return !preg_match('/^$/', $value);
 	}
 
 	/**
