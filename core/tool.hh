@@ -37,6 +37,7 @@ class CoreTool<Konsolidate> extends Konsolidate
 	{
 		if (!is_array($collection) && is_array($key))
 			return CoreTool::arrVal($collection, $key, $default);
+
 		return is_array($collection ) && isset($collection[$key]) ? $collection[$key] : $default;
 	}
 
