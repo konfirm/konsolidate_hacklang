@@ -9,13 +9,13 @@ class CoreStub<Konsolidate> extends Konsolidate
 	{
 		parent::__construct($parent);
 
-		$path = array_walk($path, function(&$p, $k, $class):void{
-			$p = realpath($p . '/' . $class);
-		}, $name);
-//
+		$virtualPath = Array();
+		foreach ($path as $tier=>$modulePath)
+			if ($modulePath && realpath($modulePath . '/' . strToLower($name)))
+				$virtualPath[$tier . ucFirst(strToLower($name))] = $modulePath . '/' . strToLower($name);
 
 		$this->_name = $name;
-		$this->_path = $this->_filterPathList(is_array($path) ? $path : []);
+		$this->_path = $virtualPath;
 	}
 
 	/**
