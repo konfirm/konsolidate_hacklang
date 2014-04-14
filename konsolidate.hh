@@ -309,7 +309,7 @@ class Konsolidate<T> implements Iterator
 	 */
 	public function getRoot():Konsolidate
 	{
-		return $this->_parent instanceof Konsolidate ? $this->_parent : $this;
+		return $this->_parent instanceof Konsolidate ? $this->_parent->getRoot() : $this;
 	}
 
 	/**
