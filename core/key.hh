@@ -1,4 +1,4 @@
-<?hh
+<?hh  //  strict
 
 
 /**
@@ -70,7 +70,7 @@ class CoreKey extends Konsolidate
 	 *  @return  object
 	 *  @note    This object is constructed by one of Konsolidates modules
 	 */
-	public function __construct($parent)
+	public function __construct(Konsolidate $parent)
 	{
 		parent::__construct($parent);
 

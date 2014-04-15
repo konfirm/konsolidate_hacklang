@@ -1,4 +1,4 @@
-<?hh
+<?hh  //  strict
 
 /**
  *  Convert length measurement units

@@ -1,4 +1,4 @@
-<?hh
+<?hh  //  strict
 
 /**
  *  Provide easy access to uploaded files

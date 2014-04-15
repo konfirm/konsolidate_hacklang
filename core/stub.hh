@@ -5,7 +5,16 @@ class CoreStub<Konsolidate> extends Konsolidate
 {
 	protected string $_name;
 
-	public function __construct($parent, $name, $path)
+	/**
+	 *  __construct, CoreStub constructor
+	 *  @name    __construct
+	 *  @type    constructor
+	 *  @access  public
+	 *  @param   object parent object
+	 *  @param   string type [optional, default null - the request method used]
+	 *  @return  object
+	 */
+	public function __construct(Konsolidate $parent, string $name, array $path)
 	{
 		parent::__construct($parent);
 
@@ -24,7 +33,7 @@ class CoreStub<Konsolidate> extends Konsolidate
 	 *  @type    method
 	 *  @access  public
 	 */
-	public function __toString()
+	public function __toString():string
 	{
 		$return  = '<div style="font-family:\'Lucida Grande\', Verdana, Arial, sans-serif;font-size:11px;color">';
 		$return .= '<h3 style="margin:0;padding:0;">' . $this->_name . ' (' . get_class($this) . ')' . '</h3>';

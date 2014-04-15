@@ -1,4 +1,4 @@
-<?hh
+<?hh  //  strict
 
 /**
  *  Read ini files and store ini-sections/variables for re-use in the Config Module

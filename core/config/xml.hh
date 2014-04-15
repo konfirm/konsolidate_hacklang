@@ -1,4 +1,4 @@
-<?hh
+<?hh  //  strict
 
 /**
  *  Read and parse xml files and store it's sections/variables for re-use in the Config Module

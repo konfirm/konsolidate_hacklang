@@ -1,4 +1,4 @@
-<?hh
+<?hh  //  strict
 
 /**
  *  Provide easy access to all request data
@@ -9,14 +9,8 @@
  */
 class CoreRequest<Konsolidate> extends Konsolidate
 {
-	protected string $_order;
-	protected string $_raw;
-	protected SimpleXMLElement $_xml;
-	protected $_file;
-	protected $_filereference;
-
 	/**
-	 *  magic __construct, CoreRequest constructor
+	 *  CoreRequest constructor
 	 *  @name    __construct
 	 *  @type    constructor
 	 *  @access  public
@@ -24,94 +18,122 @@ class CoreRequest<Konsolidate> extends Konsolidate
 	 *  @return  object
 	 *  @note    This object is constructed by one of Konsolidates modules
 	 */
-	function __construct($parent)
+	public function __construct(Konsolidate $parent)
 	{
 		parent::__construct($parent);
 
-		$this->_order         = $this->get('/Config/Request/variableorder', 'r');
-		$this->_raw           = null;
-		$this->_xml           = null;
-		$this->_file          = null;
-		$this->_filereference = null;
 		$this->_collect();
 	}
 
 	/**
-	 *  is the request a POST
-	 *  @name    isPosted
+	 *  Was the request of type GET
+	 *  @name    isGet
 	 *  @type    method
 	 *  @access  public
 	 *  @return  bool
 	 */
-	public function isPosted():bool
+	public function isGet():bool
 	{
-		return $this->call('/Tool/isPosted');
+		return isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'GET';
 	}
 
 	/**
-	 *  retrieve the raw request data
-	 *  @name    getRawRequest
+	 *  Was the request of type POST
+	 *  @name    isPost
 	 *  @type    method
 	 *  @access  public
-	 *  @return  string (bool false, if no raw data is available)
+	 *  @return  bool
 	 */
-	public function getRawRequest():mixed
+	public function isPost():bool
 	{
-		return !is_null($this->_raw) ? $this->_raw : false;
+		return isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST';
 	}
 
 	/**
-	 *  retrieve XML request data
-	 *  @name    getXML
+	 *  Was the request of type PUT
+	 *  @name    isPut
 	 *  @type    method
 	 *  @access  public
-	 *  @return  SimpleXMLElement (bool false, if no xml data is available)
-	 *  @syntax  SimpleXMLElement CoreRequest->getXML()
+	 *  @returns bool
 	 */
-	public function getXML():mixed
+	public function isPut():bool
 	{
-		return !is_null($this->_xml) ? $this->_xml : false;
+		return isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'PUT';
 	}
 
 	/**
-	 *  retrieve variables from a raw data request
-	 *  @name    _collectFromRaw
+	 *  Was the request of type DELETE
+	 *  @name    isDelete
 	 *  @type    method
-	 *  @access  protected
-	 *  @return  void
+	 *  @access  public
+	 *  @returns bool
 	 */
-	protected function _collectFromRaw():void
+	public function isDelete():bool
 	{
-		$this->_raw = trim(file_get_contents('php://input'));  //  Try to determine what kind of request triggered this class
-		switch (substr($this->_raw, 0, 1))
+		return isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'DELETE';
+	}
+
+
+	/**
+	 *  get a property value from a module using a path, in contrast to the overridden getter method
+	 *  this implementation takes the various supported request methods into consideration as sub modules
+	 *  @name    get
+	 *  @type    method
+	 *  @access  public
+	 *  @param   string   path to the property to get
+	 *  @param   mixed    default return value (optional, default null)
+	 *  @return  mixed
+	 *  @note    supplying a default value should be done per call, the default is never stored
+	 */
+	public function get():mixed
+	{
+		$arg       = func_get_args();
+		$key       = array_shift($arg);
+		$default   = count($arg) ? array_shift($arg) : null;
+		$seperator = strrpos($key, static::MODULE_SEPARATOR);
+
+		if ($seperator !== false && ($module = $this->getModule(substr($key, 0, $seperator))) !== false)
 		{
-			case '<':  //  XML  //  in-class for now
-				$this->_xml = new SimpleXMLElement($this->_raw);
+			return $module->get(substr($key, $seperator + 1), $default);
+		}
+		else if ($this->{$_SERVER['REQUEST_METHOD']} && isset($this->{$_SERVER['REQUEST_METHOD']}->{$key}))
+		{
+			return $this->{$_SERVER['REQUEST_METHOD']}->{$key};
+		}
+		else if ($this->checkModuleAvailability($key))
+		{
+			return $this->register($key);
+		}
+		$return = $this->$key;
 
-				foreach ($this->_xml as $key=>$value)
-					$this->$key = (string) $value;
+		return is_null($return) ? $default : $return; // can (and will be by default!) still be null
+	}
+
+	/**
+	 *  Create a sub module of the current one
+	 *  @name    instance
+	 *  @type    method
+	 *  @access  public
+	 *  @param   string   modulename
+	 *  @param   mixed    param N
+	 *  @return  object
+	 */
+	public function instance($module)
+	{
+		switch ($module)
+		{
+			case 'GET':
+			case 'POST':
+			case 'PUT':
+			case 'DELETE':
+				if (!array_key_exists($module, $this->_property))
+					$this->_property[$module] = parent::instance('Type', $module);
+
+				return $this->_property[$module];
 				break;
 		}
-	}
-
-	/**
-	 *  retrieve variables from a HTTP request (POST/GET only)
-	 *  @name    _collectHTTP
-	 *  @type    method
-	 *  @access  protected
-	 *  @return  bool
-	 */
-	protected function _collectHTTP(array<string, mixed> $collection):bool
-	{
-		if (is_array($collection) && (bool) count($collection))
-		{
-			foreach ($collection as $param=>$value)
-				$this->$param = $value;
-
-			return true;
-		}
-
-		return false;
+		$arg = func_get_args();
+		return call_user_func_array(Array('parent', 'instance'), $arg);
 	}
 
 	/**
@@ -122,157 +144,48 @@ class CoreRequest<Konsolidate> extends Konsolidate
 	 *  @return  void
 	 */
 	protected function _collect():void
-	{  //  gather variables and if request method is post and it failed to gather variables, try to collect data from raw input.
-		if (!$this->_collectHTTP($this->_getCollection()) && $this->isPosted())
-			$this->_collectFromRaw();  //  if the request method is post and the appear to be (one or more) files attached, prepare those aswel
-		if ($this->isPosted() && is_array($_FILES) && count($_FILES))
-			$this->_collectFiles();
-	}
-
-
-	/**
-	 *  Determine the proper variable processing order
-	 *  @name    _getCollection
-	 *  @type    method
-	 *  @access  protected
-	 *  @return  array     if no order is specified, _GET or _POST global, merged result of the desired order otherwise
-	 *  @note    By default _getCollection module will distinguish between GET and POST requests, they will not be processed both!
-	 *           You can override this behaviour by setting the variable order (EGPCS, like the variables_order php.ini setting) to /Config/Request/variableorder
-	 *           E.g. $this->set('/Config/Request/variableorder', 'GP');  //  combine GET and POST variables
-	 */
-	protected function _getCollection():array<string, mixed>
 	{
-		if (!is_null($this->_order))
+		$method = $_SERVER['REQUEST_METHOD'];
+
+		switch ($method)
 		{
-			$return = Array();
-			for ($i = 0; $i < strlen($this->_order); ++$i)
-				switch (strToUpper($this->_order{$i}))
-				{
-					case 'G':
-						$return = array_merge($return, $_GET);
-						break;
+			case 'POST':
+			case 'PUT':
+			case 'DELETE':
+				$this->$method = parent::instance('Type', $method);
+				//  no break, all of these requests may also have GET variables
 
-					case 'P':
-						$return = array_merge($return, $_POST);
-						break;
+			case 'GET':
+				$this->GET = parent::instance('Type', 'GET');
+				break;
 
-					case 'C':
-						$return = array_merge($return, $_COOKIE);
-						break;
-
-					case 'R':
-						$return = array_merge($return, $_REQUEST);
-						 break;
-
-					case 'E':
-						$return = array_merge($return, $_ENV);
-						break;
-
-					case 'S':
-						$return = array_merge($return, $_SERVER);
-						break;
-
-				}
-
-			return $return;
+			default:
+				$this->call('/Log/message', 'Request-type ' . $method . ' not supported', 3);
+				break;
 		}
 
-		return $this->isPosted() ? $_POST : $_GET;
-	}
-
-	/**
-	 *  Gather file information attached to the (POST only) request
-	 *  @name    _collectFiles
-	 *  @type    method
-	 *  @access  protected
-	 *  @return  void
-	 */
-	protected function _collectFiles():void
-	{
-		$this->_file          = Array();
-		$this->_filereference = Array();
-
-		foreach ($_FILES as $field=>$file)
-			if (isset($file['error']))  //  we have one or more file
-			{
-				if (is_array($file['error']))  //  multiple files
-				{
-					$fileList = Array();
-					foreach ($file['error'] as $key=>$void)
-					{
-						$file = $this->_createFileInstance($file, $field, $key);
-						array_push($this->_file, $file);
-						array_push($fileList, $file);
-					}
-				}
-				else  //  single file
-				{
-					$fileList = $this->_createFileInstance($file, $field);
-					array_push($this->_file, $fileList);
-				}
-
-				$this->_filereference[$field] = $fileList;
-			}
-	}
-
-	/**
-	 *  Create and populate an (unique) instance of the Request/File module
-	 *  @name    _createFileInstance
-	 *  @type    method
-	 *  @access  protected
-	 *  @param   array   _FILES record
-	 *  @param   string  fieldname
-	 *  @param   string  reference (only when multiple files are uploaded)
-	 *  @return  *RequestFile instance
-	 */
-	protected function _createFileInstance(array<string, string> $file, string $variable, ?string $reference):CoreRequestFile
-	{
-		$tmp = $this->instance('File');
-		$tmp->variable = $variable;
-
-		foreach ($file as $key=>$value)
-			$tmp->{$key} = is_null($reference) ? $value : $value[$reference];
-
-		return $tmp;
-	}
-
-	/**
-	 *  Does the request have files attached?
-	 *  @name    hasFiles
-	 *  @type    method
-	 *  @access  public
-	 *  @return  bool
-	 */
-	public function hasFiles():bool
-	{
-		return is_array($this->_file) && (bool) count($this->_file);
+		$GLOBALS['_REQUEST'] = $this;
 	}
 
 
-	/**
-	 *  Obtain the array of files
-	 *  @name    getFiles
-	 *  @type    method
-	 *  @access  public
-	 *  @param   bool  referenced array (non referenced array containing variable names)
-	 *  @return  array files
-	 */
-	public function getFiles(bool $reference=false):array<string, array>
+	/*  ArrayAccess implementation */
+	public function offsetGet($offset)
 	{
-		return $reference ? $this->_filereference : $this->_file;
+		return $this->$offset;
 	}
 
-
-	/**
-	 *  Obtain a specific filereference (formfield)
-	 *  @name    getFileByReference
-	 *  @type    method
-	 *  @access  public
-	 *  @param   string reference name
-	 *  @return  mixed  file object, array of file objects or false if reference does not exist
-	 */
-	public function getFileByReference(string $reference):mixed
+	public function offsetSet($offset, $value)
 	{
-		return isset($this->_filereference[$reference]) ? $this->_filereference[$reference] : false;
+		return $this->$offset = $value;
+	}
+
+	public function offsetExists($offset)
+	{
+		return isset($this->$offset);
+	}
+
+	public function offsetUnset($offset)
+	{
+		unset($this->$offset);
 	}
 }

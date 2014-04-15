@@ -1,4 +1,4 @@
-<?hh
+<?hh  //  strict
 
 define('TINYINT_MIN', -128);                // for future reference
 define('TINYINT_MAX',  127);                // for future reference

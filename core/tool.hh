@@ -1,4 +1,4 @@
-<?hh
+<?hh  //  strict
 
 /**
  *  Abstracted functionality often used in- and outside Konsolidate
