@@ -126,7 +126,7 @@ class CoreRequest<Konsolidate> extends Konsolidate
 			case 'POST':
 			case 'PUT':
 			case 'DELETE':
-				if (!array_key_exists($module, $this->_property))
+				if (!isset($this->_property[$module]))
 					$this->_property[$module] = parent::instance('Type', $module);
 
 				return $this->_property[$module];
