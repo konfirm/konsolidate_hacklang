@@ -1,9 +1,9 @@
 <?hh  //  strict
 
+
 /**
  *  Provide easy access to uploaded files
  *  @name    CoreRequestFile
- *  @type    class
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
@@ -119,35 +119,35 @@ class CoreRequestFile<Konsolidate> extends Konsolidate
 
 		switch ($error)
 		{
-			case UPLOAD_ERR_OK:         
+			case UPLOAD_ERR_OK:
 				$result = 'No error';
 				break;
 
-			case UPLOAD_ERR_INI_SIZE:   
+			case UPLOAD_ERR_INI_SIZE:
 				$result = 'The file exceeds PHP maximum file size';
 				break;
 
-			case UPLOAD_ERR_FORM_SIZE:  
+			case UPLOAD_ERR_FORM_SIZE:
 				$result = 'The file exceeds Form maximum file size';
 				break;
 
-			case UPLOAD_ERR_PARTIAL:    
+			case UPLOAD_ERR_PARTIAL:
 				$result = 'The file was only partially uploaded';
 				break;
 
-			case UPLOAD_ERR_NO_FILE:    
+			case UPLOAD_ERR_NO_FILE:
 				$result = 'No file was uploaded';
 				break;
 
-			case UPLOAD_ERR_NO_TMP_DIR: 
+			case UPLOAD_ERR_NO_TMP_DIR:
 				$result = 'Missing temporary upload location';
 				break;
 
-			case UPLOAD_ERR_CANT_WRITE: 
+			case UPLOAD_ERR_CANT_WRITE:
 				$result = 'Failed to write file to disk';
 				break;
 
-			case UPLOAD_ERR_EXTENSION:  
+			case UPLOAD_ERR_EXTENSION:
 				$result = 'File upload stopped by extension';
 				break;
 		};
