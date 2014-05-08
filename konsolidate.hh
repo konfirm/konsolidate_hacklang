@@ -15,7 +15,7 @@ class Konsolidate<T> implements Iterator
 	protected array<string> $_tracelog;
 
 
-	public function __construct(mixed $path)
+	public function __construct(mixed $parent)
 	{
 		$this->_debug       = false;
 		$this->_module      = Array();
@@ -23,17 +23,19 @@ class Konsolidate<T> implements Iterator
 		$this->_lookupcache = Array();
 		$this->_tracelog    = Array();
 
-		if (is_object($path) && $path instanceof Konsolidate)
+		//  the only time when $parent is not an instance of Konsolidate is when Konsolidate in itself gets constructed
+		//  hence the scenario which occurs most often is when children are being constructed, so we check this first
+		if ($parent instanceof Konsolidate)
 		{
-			$this->_parent = $path;
+			$this->_parent = $parent;
 			$this->_path   = $this->getFilePath();
 		}
-		else if (is_array($path))
+		else if (is_array($parent))
 		{
-			foreach ($path as $tier=>$directory)
-				$path[$tier] = realpath($directory);
+			foreach ($parent as $tier=>$directory)
+				$parent[$tier] = realpath($directory);
 
-			$this->_path = $this->_filterPathList($path);
+			$this->_path = $this->_filterPathList($parent);
 		}
 	}
 
@@ -290,7 +292,7 @@ class Konsolidate<T> implements Iterator
 			foreach ($this->_path as $tier=>$path)
 			{
 				$modulePath = $path . '/' . $module;
-				if (realpath($modulePath) || realpath($modulePath . '.class.php'))
+				if (realpath($modulePath) || realpath($modulePath . '.hh'))
 				{
 					static::$_modulecheck[$class][$module] = true;
 					break;
@@ -334,19 +336,22 @@ class Konsolidate<T> implements Iterator
 		$included = array_flip(get_included_files());
 		$pathList = array_reverse($this->_path, true);
 		$imported = false;
+
 		foreach ($pathList as $path)
-		{
-			$current = $path . '/' . strToLower($file);
-			if (isset($included[$current]))
+			if ($path)
 			{
-				$imported = true;
+				$current = $path . '/' . strToLower($file);
+				if (isset($included[$current]))
+				{
+					$imported = true;
+				}
+				else if (realpath($current))
+				{
+					include($current);
+					$imported = true;
+				}
 			}
-			else if (realpath($current))
-			{
-				include($current);
-				$imported = true;
-			}
-		}
+
 		return $imported;
 	}
 
@@ -390,7 +395,7 @@ class Konsolidate<T> implements Iterator
 			return $this->_path;
 
 		$parentPath = $this->_parent->getFilePath();
-		$class      = strtolower(str_replace(array_keys($parentPath), '', get_class($this)));
+		$class      = strtolower(str_ireplace(array_keys($parentPath), '', get_class($this)));
 		$pathList   = Array();
 
 		foreach ($parentPath as $tier=>$path)
@@ -518,7 +523,7 @@ class Konsolidate<T> implements Iterator
 	 *  @access  public
 	 *  @param   mixed   arg N
 	 *  @return  mixed
-	 *  @note    You can now effectively leave out the '->call' part when calling on methods, 
+	 *  @note    You can now effectively leave out the '->call' part when calling on methods,
 	 *           e.g. $oK('/DB/query', 'SHOW TABLES') instead of $oK->call('/DB/query', 'SHOW TABLES');
 	 *  @see     call
 	 */
