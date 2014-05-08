@@ -7,7 +7,7 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreLog extends Konsolidate
+class CoreLog<Konsolidate> extends Konsolidate
 {
 	/**
 	 *  The verbositylevel you wish to log
@@ -128,23 +128,23 @@ class CoreLog extends Konsolidate
 		switch( (int) $verbosity )
 		{
 	 		case 0:
-	 			$return = 'Critical'; 
+	 			$return = 'Critical';
 	 			break;
 
 	 		case 1:
-	 			$return = 'Severe';   
+	 			$return = 'Severe';
 	 			break;
 
 	 		case 2:
-	 			$return = 'Warning';  
+	 			$return = 'Warning';
 	 			break;
 
 	 		case 3:
-	 			$return = 'Info';     
+	 			$return = 'Info';
 	 			break;
 
 	 		case 4:
-	 			$return = 'Debug';    
+	 			$return = 'Debug';
 	 			break;
 
 		}

@@ -8,7 +8,7 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreKey extends Konsolidate
+class CoreKey<Konsolidate> extends Konsolidate
 {
 	const CHAR    = 'abcdefghijklmnopqrstuvwxyz';
 	const NUMERIC = '0123456789';
