@@ -30,7 +30,7 @@ class CoreTemplateFeatureStyle extends CoreTemplateFeature
                 if ($files->contains($requirement->file) && $requirement->multiple !== 'true')
                     continue;
                 else
-                    $files->add($requirement->file, true);
+                    $files->add(Pair {$requirement->file, true});
             }
 
 			//  if the require feature has been fixated (either the template author added an attribute fixate="true" or
