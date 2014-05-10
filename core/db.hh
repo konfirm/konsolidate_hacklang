@@ -155,14 +155,14 @@ class CoreDB extends Konsolidate
 	 *  @access  public
 	 *  @param   string SQL-query
 	 *  @param   bool   use cache (optional, default true)
-	 *  @return  ResultObject
+	 *  @return  mixed  result [the result object for the database type used, bool false on error]
 	 *  @note    the optional cache is per pageview and in memory only, it merely prevents
 	 *           executing the exact same query over and over again
 	 */
-	public function query(string $query, $bUseCache=true)
+	public function query(string $query, bool $useCache=true):mixed
 	{
 		if ($this->_default && isset($this->_pool[$this->_default]) && is_object($this->_pool[$this->_default]))
-			return $this->_pool[$this->_default]->query($sQuery, $bUseCache);
+			return $this->_pool[$this->_default]->query($sQuery, $useCache);
 
 		return false;
 	}
@@ -175,14 +175,14 @@ class CoreDB extends Konsolidate
 	 *  @access  public
 	 *  @param   string module/connection
 	 *  @return  Object
-	 *  @note    this method is an override to Konsolidates default behaviour
 	 */
-	public function register($sModule)
+	public function register(string $module):Konsolidate
 	{
-		$reference = strToUpper($sModule);
+		$reference = strToUpper($module);
 		if (is_array($this->_pool) && array_key_exists($reference, $this->_pool) && is_object($this->_pool[$reference]))
 			return $this->_pool[$reference];
-		return parent::register($sModule);
+
+		return parent::register($module);
 	}
 
 	/**
@@ -191,7 +191,7 @@ class CoreDB extends Konsolidate
 	 *  @type    method
 	 *  @access  public
 	 */
-	public function __destruct()
+	public function __destruct():void
 	{
 		$this->disconnect(true);
 	}
@@ -201,28 +201,30 @@ class CoreDB extends Konsolidate
 	 *  @name    __call
 	 *  @type    method
 	 *  @access  public
+	 *  @param   string  method
+	 *  @param   array   arguments
 	 *  @note    By default all calls which are not defined in this class are bridged to the default connection
 	 *  @see     setDefaultConnection
 	 */
-	public function __call($sCall, $aArgument)
+	public function __call(string $method, array $arg):mixed
 	{
 		//  Get the first argument, which could be a reference to a pool item
-		$reference = (string) array_shift($aArgument);
+		$reference = (string) array_shift($arg);
 
 		//  In case the first argument was not a pool item, put the first argument back in refer to the master
 		if (!array_key_exists($reference, $this->_pool))
 		{
-			array_unshift($aArgument, $reference);
+			array_unshift($arg, $reference);
 			$reference = $this->_default;
 		}
 
-		if (method_exists($this->_pool[$reference], $sCall))
+		if (method_exists($this->_pool[$reference], $method))
 			return call_user_func_array(Array(
                     $this->_pool[$reference], // the database object
-					$sCall                    // the method
+					$method                    // the method
                 ),
-				$aArgument                    // the arguments
+				$arg                    // the arguments
             );
-		return parent::__call($sCall, $aArgument);
+		return parent::__call($method, $arg);
 	}
 }
