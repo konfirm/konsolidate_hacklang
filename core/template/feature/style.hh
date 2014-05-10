@@ -5,7 +5,7 @@
  *  Style Template Feature, handles the <k:style /> feature which collects all stylesheet requirements and removes duplicates
  *  @name    CoreTemplateFeatureStyle
  *  @package Konsolidate
- *  @author  Rogier Spieker <rogier@konsolidate.net>
+ *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
 class CoreTemplateFeatureStyle extends CoreTemplateFeature
 {

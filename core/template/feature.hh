@@ -5,7 +5,7 @@
  *  Basic template feature class, associated with a DOMNode in the (XML) template
  *  @name    CoreTemplateFeature
  *  @package Konsolidate
- *  @author  Rogier Spieker <rogier@konsolidate.net>
+ *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
 class CoreTemplateFeature<Konsolidate> extends Konsolidate
 {

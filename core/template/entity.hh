@@ -5,7 +5,7 @@
  *  Resolve HTML entities to a numeric (decimal or hexadecimal) representation or the actual referenced UTF-8 character
  *  @name    CoreTemplateEntity
  *  @package Konsolidate
- *  @author  Rogier Spieker <rogier@konsolidate.net>
+ *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
 class CoreTemplateEntity<Konsolidate> extends Konsolidate
 {

@@ -5,7 +5,7 @@
  *  Block Template Feature, handles the <k:block /> feature which allow for repeating blocks of (x)html
  *  @name    CoreTemplateFeatureBlock
  *  @package Konsolidate
- *  @author  Rogier Spieker <rogier@konsolidate.net>
+ *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
 class CoreTemplateFeatureBlock<CoreTemplateFeature> extends CoreTemplateFeature
 {

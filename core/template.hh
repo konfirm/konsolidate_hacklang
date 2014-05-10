@@ -8,7 +8,7 @@
  *  Template class
  *  @name    CoreTemplate
  *  @package Konsolidate
- *  @author  Rogier Spieker <rogier@konsolidate.net>
+ *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
 class CoreTemplate<Konsolidate> extends Konsolidate
 {

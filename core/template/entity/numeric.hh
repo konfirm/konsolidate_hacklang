@@ -5,7 +5,7 @@
  *  Numeric entity resolver
  *  @name    CoreTemplateEntityNumeric
  *  @package Konsolidate
- *  @author  Rogier Spieker <rogier@konsolidate.net>
+ *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
 class CoreTemplateEntityNumeric<Konsolidate> extends Konsolidate
 {

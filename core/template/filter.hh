@@ -5,7 +5,7 @@
  *  Filters to be used from template phase hooks
  *  @name    CoreTemplateFilter
  *  @package Konsolidate
- *  @author  Rogier Spieker <rogier@konsolidate.net>
+ *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
 class CoreTemplateFilter<Konsolidate> extends Konsolidate
 {

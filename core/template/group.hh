@@ -5,7 +5,7 @@
  *  Group together features returned by CoreTemplate::getFeatures and bridge all template calls to each member of the group
  *  @name    CoreTemplateGroup
  *  @package Konsolidate
- *  @author  Rogier Spieker <rogier@konsolidate.net>
+ *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
 class CoreTemplateGroup<Konsolidate> extends Konsolidate
 {

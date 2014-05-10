@@ -6,7 +6,7 @@
  *  unwanted duplicates
  *  @name    CoreTemplateFeatureScript
  *  @package Konsolidate
- *  @author  Rogier Spieker <rogier@konsolidate.net>
+ *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
 class CoreTemplateFeatureScript<CoreTemplateFeature> extends CoreTemplateFeature
 {

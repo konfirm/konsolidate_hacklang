@@ -5,7 +5,7 @@
  *  UTF-8 entity resolver
  *  @name    CoreTemplateEntityUTF8
  *  @package Konsolidate
- *  @author  Rogier Spieker <rogier@konsolidate.net>
+ *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
 class CoreTemplateEntityUTF8 extends Konsolidate
 {

@@ -1,6 +1,11 @@
 <?hh  //  strict
 
 
+/**
+ *  The Konsolidate base class, responsible for all interaction between the modules
+ *  @name    Konsolidate
+ *  @author  Rogier Spieker <rogier@konsolidate.nl>
+ */
 class Konsolidate<T> implements Iterator
 {
 	const MODULE_SEPARATOR = '/';

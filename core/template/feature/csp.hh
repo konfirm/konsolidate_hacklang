@@ -6,7 +6,7 @@
  *  script-src and style-src rules based on file requirements (<k:require file="..." />)
  *  @name    CoreTemplateFeatureCSP
  *  @package Konsolidate
- *  @author  Rogier Spieker <rogier@konsolidate.net>
+ *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
 class CoreTemplateFeatureCSP extends CoreTemplateFeature
 {

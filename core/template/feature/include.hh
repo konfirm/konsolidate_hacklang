@@ -5,7 +5,7 @@
  *  Include Template Feature, handles the <k:include /> feature which includes a subtemplate and places it at the position of the <k:include /> node
  *  @name    CoreTemplateFeatureInclude
  *  @package Konsolidate
- *  @author  Rogier Spieker <rogier@konsolidate.net>
+ *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
 class CoreTemplateFeatureInclude<CoreTemplateFeature> extends CoreTemplateFeature
 {

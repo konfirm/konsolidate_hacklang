@@ -5,7 +5,7 @@
  *  MySQL Connectivity
  *  @name    CoreDBMySQLi
  *  @package Konsolidate
- *  @author  Rogier Spieker <rogier@konsolidate.net>
+ *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
 class CoreDBMySQLi<Konsolidate> extends Konsolidate
 {
