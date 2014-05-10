@@ -162,7 +162,7 @@ class CoreDB<Konsolidate> extends Konsolidate
 	public function query(string $query, bool $useCache=true):mixed
 	{
 		if ($this->_default && isset($this->_pool[$this->_default]) && is_object($this->_pool[$this->_default]))
-			return $this->_pool[$this->_default]->query($sQuery, $useCache);
+			return $this->_pool[$this->_default]->query($query, $useCache);
 
 		return false;
 	}
