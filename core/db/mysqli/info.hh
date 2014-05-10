@@ -9,7 +9,17 @@
  */
 class CoreDBMySQLiInfo<Konsolidate> extends Konsolidate
 {
-	public function process(resource $connection, bool $extendInfo=false, ?Array $appendInfo=null):void
+    /**
+     *  Process the information from a MySQLi instance
+     *  @name    process
+     *  @type    method
+     *  @access  public
+     *  @param   MySQLi   connection
+     *  @param   bool     extendedInfo
+     *  @param   Array    appendInfo
+     *  @return  void
+     */
+	public function process(MySQLi $connection, bool $extendInfo=false, ?Array $appendInfo=null):void
 	{
 		$this->info = $connection->info;
 		$info       = $this->_parseData($this->info);
@@ -27,6 +37,15 @@ class CoreDBMySQLiInfo<Konsolidate> extends Konsolidate
 			$this->{$key} = $value;
 	}
 
+    /**
+     *  Collect specified or all information groups
+     *  @name    collect
+     *  @type    method
+     *  @access  public
+     *  @param   string  group1
+     *  @param   string  group...
+     *  @return  void
+     */
 	public function collect():void
 	{
 		$arg = func_get_args();
@@ -36,7 +55,15 @@ class CoreDBMySQLiInfo<Konsolidate> extends Konsolidate
 			$this->register($module);
 	}
 
-	protected function _parseData($data):array
+    /**
+     *  Parse a datablock containing information
+     *  @name    _parseData
+     *  @type    method
+     *  @access  protected
+     *  @param   string  data
+     *  @return  array
+     */
+	protected function _parseData(?string $data):array
 	{
 		if (!empty($data) && (bool) preg_match_all('/([a-z_]+)\:([0-9\.]+),*/', preg_replace(Array('/\s\s/', '/\:\s/', '/\s/'), Array(',', ':', '_'), strtolower($data)), $match) && count($match) === 3)
 			return array_combine($match[1], $match[2]);
