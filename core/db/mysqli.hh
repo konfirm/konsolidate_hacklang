@@ -408,6 +408,7 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 
 		if ($versionString)
 			return $this->_versionToString($this->_conn->server_version);
+
 		return $this->_conn->server_version;
 	}
 
@@ -434,7 +435,7 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 	 *  @returns object info
 	 *  @note    by requesting extended info, the connection stats are added to the info object
 	 */
-	public function info(bool $extendInfo=false, Array $appendInfo=null):CoreMySQLiInfo
+	public function info(bool $extendInfo=false, Array $appendInfo=null):CoreDBMySQLiInfo
 	{
 		$result = $this->instance('Info');
 		$result->process($this->_conn, $extendInfo, $appendInfo);
@@ -455,7 +456,7 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 		$major = round($version / 10000);
 		$minor = round(($version - ($major * 10000)) / 100);
 
-		return sprintf('%d.%d.%d', $major, $minor, ($version - (($main * 10000) + ($minor * 100))));
+		return sprintf('%d.%d.%d', $major, $minor, ($version - (($major * 10000) + ($minor * 100))));
 	}
 
 	/**
