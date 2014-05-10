@@ -7,7 +7,7 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreTemplateFeatureStyle extends CoreTemplateFeature
+class CoreTemplateFeatureStyle<CoreTemplateFeature> extends CoreTemplateFeature
 {
 	/**
 	 *  Render the feature

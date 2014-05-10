@@ -7,7 +7,7 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreDBMySQLiException extends Exception
+class CoreDBMySQLiException<Exception> extends Exception
 {
 	/**
 	 *  The error message

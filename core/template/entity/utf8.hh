@@ -7,7 +7,7 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreTemplateEntityUTF8 extends Konsolidate
+class CoreTemplateEntityUTF8<Konsolidate> extends Konsolidate
 {
 	static public Map<string, string> $resolve = Map {
 		'excl' => '!', //  exclamation mark

@@ -1,13 +1,13 @@
 <?hh
 
+
 /**
  *  DB Layer for DB connectivity
  *  @name    CoreDB
- *  @type    class
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreDB extends Konsolidate
+class CoreDB<Konsolidate> extends Konsolidate
 {
 	/**
 	 *  The database/connection pool

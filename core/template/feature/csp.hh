@@ -8,7 +8,7 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreTemplateFeatureCSP extends CoreTemplateFeature
+class CoreTemplateFeatureCSP<CoreTemplateFeature> extends CoreTemplateFeature
 {
 	protected Map<string, Map> $_policy;
 
