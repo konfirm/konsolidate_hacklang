@@ -9,6 +9,7 @@ define('MEDIUMINT_MAX',  8388607);          // for future reference
 define('INT_MIN', -2147483648);
 define('INT_MAX', 2147483647);
 
+
 /**
  *  Basic validation
  *  @name    CoreValidate

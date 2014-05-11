@@ -1,5 +1,6 @@
 <?hh  //  strict
 
+
 /**
  *  Basic verbosity based logging
  *  @name    CoreLog

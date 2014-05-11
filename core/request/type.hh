@@ -1,5 +1,6 @@
 <?hh  //  strict
 
+
 /**
  *  Provide easy access to all request data for a specific request method
  *  @name    CoreRequest

@@ -4,6 +4,7 @@
 //        This is due to an issue in version up to and including HipHop VM 3.0.1, where insertNode would raise a fatal
 //        error: "Unexpected object type stdClass."
 
+
 /**
  *  Template class
  *  @name    CoreTemplate
