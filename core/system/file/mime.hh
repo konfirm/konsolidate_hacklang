@@ -20,14 +20,15 @@ class CoreSystemFileMIME<Konsolidate> extends Konsolidate
 	 */
 	public function getType(string $file):string
 	{
-		$exists = file_exists($file);
-		if ($exists && function_exists('finfo_open'))
-			$method = '_determineTypeByFileInfo';
-		else if ($exists && function_exists('mime_content_type'))
-			$method = '_determineTypeByMimeContentType';
-		else
-			$method = '_determineTypeByExtension';
+		$method = '_determineTypeByExtension';
 
+		if (file_exists($file))
+		{
+			if (function_exists('finfo_open'))
+				$method = '_determineTypeByFileInfo';
+			else if (function_exists('mime_content_type'))
+				$method = '_determineTypeByMimeContentType';
+		}
 
 		return $this->{$method}($file);
 	}
