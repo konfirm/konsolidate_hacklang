@@ -12,21 +12,21 @@ class Konsolidate<T> implements Iterator
 
 	protected ?Konsolidate $_parent;
 	protected bool $_debug;
-	protected array<string, mixed> $_module;
+	protected Map<string, mixed> $_module;
 	protected array<string, mixed> $_property;
 	protected array<string, string> $_path;
-	protected array<string, Konsolidate> $_lookupcache;
+	protected Map<string, Konsolidate> $_lookupcache;
 	static protected bool $_modulecheck;
-	protected array<string> $_tracelog;
+	protected Vector<string> $_tracelog;
 
 
 	public function __construct(mixed $parent)
 	{
 		$this->_debug       = false;
-		$this->_module      = Array();
+		$this->_module      = Map<string, mixed> {};
 		$this->_property    = Array();
-		$this->_lookupcache = Array();
-		$this->_tracelog    = Array();
+		$this->_lookupcache = Map<string, Konsolidate> {};
+		$this->_tracelog    = Vector<string> {};
 
 		//  the only time when $parent is not an instance of Konsolidate is when Konsolidate in itself gets constructed
 		//  hence the scenario which occurs most often is when children are being constructed, so we check this first
@@ -56,16 +56,16 @@ class Konsolidate<T> implements Iterator
 	 */
 	public function get():mixed
 	{
-		$arg     = func_get_args();
-		$pty     = array_shift($arg);
-		$default = count($arg) ? array_shift($arg) : null;
+		$arg       = func_get_args();
+		$property  = array_shift($arg);
+		$default   = count($arg) ? array_shift($arg) : null;
+		$separator = strrpos($property, static::MODULE_SEPARATOR);
 
-		$separator = strrpos($pty, static::MODULE_SEPARATOR);
-		if ($separator !== false && ($module = $this->getModule(substr($pty, 0, $separator))) !== false)
-			return $module->get(substr($pty, $separator + 1), $default);
-		else if ($this->checkModuleAvailability($pty))
-			return $this->register($pty);
-		$return = $this->$pty;
+		if ($separator !== false && ($module = $this->getModule(substr($property, 0, $separator))) !== false)
+			return $module->get(substr($property, $separator + 1), $default);
+		else if ($this->checkModuleAvailability($property))
+			return $this->register($property);
+		$return = $this->$property;
 
 		return is_null($return) ? $default : $return; // can (and will be by default!) still be null
 	}
@@ -81,18 +81,18 @@ class Konsolidate<T> implements Iterator
 	 */
 	public function set():void
 	{
-		$arg  = func_get_args();
-		$pty  = array_shift($arg);
-		$separator = strrpos($pty, static::MODULE_SEPARATOR);
-		if ($separator !== false && ($module = $this->getModule(substr($pty, 0, $separator))) !== false)
+		$arg       = func_get_args();
+		$property  = array_shift($arg);
+		$separator = strrpos($property, static::MODULE_SEPARATOR);
+		if ($separator !== false && ($module = $this->getModule(substr($property, 0, $separator))) !== false)
 		{
-			array_unshift($arg, substr($pty, $separator + 1));
+			array_unshift($arg, substr($property, $separator + 1));
 			return call_user_func_array(Array($module, 'set'), $arg);
 		}
 
 		$value      = array_shift($arg);
-		$this->$pty = $value;
-		return $this->$pty === $value;
+		$this->$property = $value;
+		return $this->$property === $value;
 	}
 
 	/**
@@ -460,22 +460,22 @@ class Konsolidate<T> implements Iterator
 	}
 
 	//  Iterator functionality
-	public function key():T
+	public function key():mixed
 	{
 		return key($this->_property);
 	}
 
-	public function current():T
+	public function current():mixed
 	{
 		return current($this->_property);
 	}
 
-	public function next():T
+	public function next():mixed
 	{
 		return next($this->_property);
 	}
 
-	public function rewind():T
+	public function rewind():mixed
 	{
 		return reset($this->_property);
 	}
@@ -489,29 +489,30 @@ class Konsolidate<T> implements Iterator
 
 
 	// Magic methods.
-	public function __set(string $pty, ?mixed $value):void
+	public function __set(string $property, ?mixed $value):void
 	{
-		if (array_key_exists(strToUpper($pty), $this->_module))
-			throw new Exception('Trying to overwrite existing module ' . $pty . ' in ' . get_class($this) . ' with ' . gettype($value) . ' ' . $value);
-		else if ($this->checkModuleAvailability($pty))
+		if (array_key_exists(strToUpper($property), $this->_module))
+			throw new Exception('Trying to overwrite existing module ' . $property . ' in ' . get_class($this) . ' with ' . gettype($value) . ' ' . $value);
+		else if ($this->checkModuleAvailability($property))
 			throw new Exception('Trying to set a property ' . gettype($value) . ' ' . $value . ' in ' . get_class($this) . ' where a module with the same name is available');
-		$this->_property[$pty] = $value;
+		$this->_property[$property] = $value;
 	}
 
-	public function __get($pty):T
+	public function __get(string $property):mixed
 	{
-		if ($pty == 'modules')
+		if ($property == 'modules')
 			return $this->_module;
-		else if (array_key_exists($pty, $this->_property))
-			return $this->_property[$pty];
-		else if (array_key_exists(strToUpper($pty), $this->_module))
-			return $this->_module[strToUpper($pty)];
-		else if ($this->checkModuleAvailability($pty))
-			return $this->get($pty);
+		else if (array_key_exists($property, $this->_property))
+			return $this->_property[$property];
+		else if (array_key_exists(strToUpper($property), $this->_module))
+			return $this->_module[strToUpper($property)];
+		else if ($this->checkModuleAvailability($property))
+			return $this->get($property);
+
 		return null;
 	}
 
-	public function __call(string $method, ?array $arg):T
+	public function __call(string $method, ?array $arg):mixed
 	{
 		$self     = get_class($this);
 		$authored = $this->getTopAuthoredClass();
@@ -532,7 +533,7 @@ class Konsolidate<T> implements Iterator
 	 *           e.g. $oK('/DB/query', 'SHOW TABLES') instead of $oK->call('/DB/query', 'SHOW TABLES');
 	 *  @see     call
 	 */
-	public function __invoke():T
+	public function __invoke():mixed
 	{
 		return call_user_func_array(Array($this, 'call'), func_get_args());
 	}
@@ -545,9 +546,9 @@ class Konsolidate<T> implements Iterator
 	 *  @param   string property
 	 *  @return  bool isset
 	 */
-	public function __isset(string $pty):bool
+	public function __isset(string $property):bool
 	{
-		return isset($this->_property[$pty]);
+		return isset($this->_property[$property]);
 	}
 
 	/**
@@ -557,9 +558,9 @@ class Konsolidate<T> implements Iterator
 	 *  @access  public
 	 *  @param   string property
 	 */
-	public function __unset(string $pty):void
+	public function __unset(string $property):void
 	{
-		unset($this->_property[$pty]);
+		unset($this->_property[$property]);
 	}
 
 	/**
