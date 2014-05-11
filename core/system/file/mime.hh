@@ -16,7 +16,6 @@ class CoreSystemFileMIME<Konsolidate> extends Konsolidate
 	 *  @access  public
 	 *  @param   string filename
 	 *  @return  string MIME
-	 *  @syntax  string CoreSystemFileMIME->getType(string filename)
 	 */
 	public function getType(string $file):string
 	{
@@ -40,7 +39,6 @@ class CoreSystemFileMIME<Konsolidate> extends Konsolidate
 	 *  @access  protected
 	 *  @param   string filename
 	 *  @return  string MIME
-	 *  @syntax  string CoreSystemFileMIME->_determineTypeByMimeContentType(string filename)
 	 */
 	protected function _determineTypeByMimeContentType(string $file):string
 	{
@@ -54,7 +52,6 @@ class CoreSystemFileMIME<Konsolidate> extends Konsolidate
 	 *  @access  protected
 	 *  @param   string filename
 	 *  @return  string MIME
-	 *  @syntax  string CoreSystemFileMIME->_determineTypeByFileInfo(string filename)
 	 */
 	protected function _determineTypeByFileInfo(string $file):string
 	{
@@ -73,7 +70,6 @@ class CoreSystemFileMIME<Konsolidate> extends Konsolidate
 	 *  @access  protected
 	 *  @param   string filename
 	 *  @returns string MIME
-	 *  @syntax  string CoreSystemFileMIME->_determineTypeByExtension(string filename)
 	 */
 	protected function _determineTypeByExtension($file)
 	{

@@ -363,7 +363,7 @@ class Konsolidate<T> implements Iterator
 	public function exception(string $message, int $code=0):void
 	{
 		$this->import('exception.hh');
-		$class = str_replace(array_keys($this->getRoot()->getFilePath(), '', get_class($this) . 'Exception'));
+		$class = str_replace(array_keys($this->getRoot()->getFilePath()), '', get_class($this) . 'Exception');
 		$throw = class_exists($class) ? $class : null;
 
 		if (empty($throw))
