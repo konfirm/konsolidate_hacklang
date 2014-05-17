@@ -283,8 +283,15 @@ class Konsolidate<T> implements Iterator
 		return $instance;
 	 }
 
-
-	public function checkModuleAvailability($module)
+	/**
+	 *  Check if an authored module is available
+	 *  @name    checkModuleAvailability
+	 *  @type    method
+	 *  @access  public
+	 *  @param   string  module name
+	 *  @return  bool    available
+	 */
+	public function checkModuleAvailability(string $module):bool
 	{
 		$module = strtolower($module);
 		$class  = get_class($this);
@@ -331,7 +338,15 @@ class Konsolidate<T> implements Iterator
 		return $this->_parent;
 	}
 
-	public function import($file)
+	/**
+	 *  Import a module/class file
+	 *  @name    import
+	 *  @type    method
+	 *  @access  public
+	 *  @param   string file name
+	 *  @return  bool   imported
+	 */
+	public function import(string $file):bool
 	{
 		$separator = strrpos($file, static::MODULE_SEPARATOR);
 		if ($separator !== false && ($module = $this->getModule(substr($file, 0, $separator))) !== false)
@@ -360,6 +375,15 @@ class Konsolidate<T> implements Iterator
 		return $imported;
 	}
 
+	/**
+	 *  Throw an Exception, trying to use the most appropriate exception class
+	 *  @name    exception
+	 *  @type    method
+	 *  @access  public
+	 *  @param   string message
+	 *  @param   int    error code
+	 *  @return  void   (throws an Exception)
+	 */
 	public function exception(string $message, int $code=0):void
 	{
 		$this->import('exception.hh');
@@ -413,12 +437,16 @@ class Konsolidate<T> implements Iterator
 		return $pathList ? $this->_filterPathList($pathList) : [];
 	}
 
-
+	/**
+	 *  Determine the first parent class which is authored and not a stub created by Konsolidate
+	 *  @name    getTopAuthoredClass
+	 *  @type    method
+	 *  @access  public
+	 *  @return  string  class name
+	 */
 	public function getTopAuthoredClass():string
 	{
-		if (property_exists($this, '_dynamicStubClass'))
-			return $this->call('../getTopAuthoredClass');
-		return get_class($this);
+		return $this instance CoreStub ? $this->call('../getTopAuthoredClass') : get_class($this);
 	}
 
 	/**
@@ -454,7 +482,7 @@ class Konsolidate<T> implements Iterator
 			if (is_array($this->_path))
 				foreach ($this->_path as $tier=>$path)
 					foreach (glob($path . '/*') as $item)
-						$list[strtolower(basename($item, '.class.php'))] = true;
+						$list[strtolower(basename($item, '.hh'))] = true;
 			static::$_modulecheck[$class] = $list;
 		}
 	}
