@@ -446,7 +446,7 @@ class Konsolidate<T> implements Iterator
 	 */
 	public function getTopAuthoredClass():string
 	{
-		return $this instance CoreStub ? $this->call('../getTopAuthoredClass') : get_class($this);
+		return $this instanceof CoreStub ? $this->call('../getTopAuthoredClass') : get_class($this);
 	}
 
 	/**
