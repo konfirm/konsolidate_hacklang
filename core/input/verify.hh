@@ -10,6 +10,20 @@
  */
 class CoreInputVerify<Konsolidate> extends Konsolidate
 {
+	public function bufferKey(string $buffer, string $key, string $separator='&'):Vector<string>
+	{
+		$result = Vector<Map> {};
+
+		if (!empty($buffer) && preg_match_all('/(' . str_replace('_', '[\[_]', preg_quote($key)) . '(?![a-z0-9_-])[^=]*)=([^' . $separator . ']*)/i', $buffer, $match))
+			for ($i = 0; $i < count($match[0]); ++$i)
+				$result->add(Map<string, string> {
+					'key'   => $match[1][$i],
+					'value' => $match[2][$i]
+				});
+
+		return $result;
+	}
+
 	/**
 	 *  Verify given key to exist in the buffer with the same (last set) value and strip out NULL bytes from values
 	 *  @name    bufferValue
@@ -23,7 +37,7 @@ class CoreInputVerify<Konsolidate> extends Konsolidate
 	 *  @return  mixed  value (one of string, array of boolean false if the value is not verified)
  	 *  @note    This method will enhance security but does not guarantee absolute safety, always check user input!
 	 */
-	public function bufferValue($buffer, $key, $value, $separator='&', $rightToLeft=true)
+	public function bufferValue(string $buffer, string $key, mixed $value, string $separator='&', bool $rightToLeft=true):mixed
 	{
 		if (!empty($buffer))
 			switch (gettype($value))
@@ -71,6 +85,7 @@ class CoreInputVerify<Konsolidate> extends Konsolidate
 					return $value;
 					break;
 			}
+
 		return $value;
 	}
 }

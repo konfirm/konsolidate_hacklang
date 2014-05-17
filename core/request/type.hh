@@ -9,20 +9,61 @@
  */
 class CoreRequestType extends Konsolidate implements ArrayAccess
 {
-	protected $_protect;
-	protected $_verify;
-	protected $_type;
+	protected bool $_protect;
+	protected bool $_verify;
+	protected string $_type;
+	protected Map<string, string> $_original;
 
 
 	public function __construct(Konsolidate $parent, ?string $type=null)
 	{
 		parent::__construct($parent);
 
-		$this->_type    = strToLower($type ?: $_SERVER['REQUEST_METHOD']);
-		$this->_protect = $this->get('/Config/Request/protect_' . $this->_type, $this->get('/Config/Request/protect', true));
-		$this->_verify  = $this->get('/Config/Request/verify_' . $this->_type, $this->get('/Config/Request/verify', true));
+		$this->_type     = strToLower($type ?: $_SERVER['REQUEST_METHOD']);
+		$this->_protect  = $this->get('/Config/Request/protect_' . $this->_type, $this->get('/Config/Request/protect', true));
+		$this->_verify   = $this->get('/Config/Request/verify_' . $this->_type, $this->get('/Config/Request/verify', true));
+		$this->_original = Map<string, Map> {};
 
 		$this->_collect();
+	}
+
+	/**
+	 *  Obtain a Map containing the original value (as it was processed by the native code) and all the keys leading to this value
+	 *  @name    original
+	 *  @type    method
+	 *  @access  public
+	 *  @param   string key
+	 *  @return  Map<string, mixed>
+	 */
+	public function original(string $key):Map<string, mixed>
+	{
+		var_dump($key, $this->_original->get($key));
+
+		return $this->_original->get($key);
+	}
+
+	/**
+	 *  Obtain a Vector of all keys of which more than one existed in the buffer
+	 *  @name    suspect
+	 *  @type    method
+	 *  @access  public
+	 *  @return  Vector<string>
+	 */
+	public function suspect():Vector<string>
+	{
+		$result = Vector<string> {};
+
+		foreach ($this->_original as $key=>$value)
+		{
+			$raw = $value->get('raw');
+			if (count($raw) > 1)
+				foreach ($raw as $variable)
+					if ($variable->get('key') !== $key)
+						$result->add($key);
+		}
+
+
+		return $result;
 	}
 
 	/**
@@ -54,7 +95,15 @@ class CoreRequestType extends Konsolidate implements ArrayAccess
 	protected function _populate(array $collection, string $buffer=null):void
 	{
 		foreach ($collection as $key=>$value)
+		{
+			$check = Map<string, mixed> {
+				'value' => $value,
+				'raw'   => $this->call('/Input/Verify/bufferKey', $buffer, $key)
+			};
+
+			$this->_original->add(Pair {$key, $check});
 			$this->_property[$key] = $this->_verify ? $this->call('/Input/Verify/bufferValue', $buffer, $key, $value) : $value;
+		}
 	}
 
 	/**
