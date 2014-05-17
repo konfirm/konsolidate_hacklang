@@ -78,10 +78,10 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 		$this->_transaction = false;
 
 		$this->_fingerprintreplacement = Map<string, string> {
-			'string' => $this->get('/Config/MySQL/fingerprint_string', '"$"'),
-			'number' => $this->get('/Config/MySQL/fingerprint_number', '#'),
-			'NULL'   => $this->get('/Config/MySQL/fingerprint_null', 'NULL'),
-			'names'  => $this->get('/Config/MySQL/fingerprint_names', '`?`')
+			'string' => $this->get('/Config/MySQLi/fingerprint_string', '"$"'),
+			'number' => $this->get('/Config/MySQLi/fingerprint_number', '#'),
+			'NULL'   => $this->get('/Config/MySQLi/fingerprint_null', 'NULL'),
+			'names'  => $this->get('/Config/MySQLi/fingerprint_names', '`?`')
 		};
 	}
 

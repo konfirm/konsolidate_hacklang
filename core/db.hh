@@ -61,7 +61,7 @@ class CoreDB<Konsolidate> extends Konsolidate
 
 		if ($this->_default === false)
 			$this->_default = $reference;
-
+		
 		$this->_pool[$reference] = $this->instance($uri['scheme']);
 
 		if (is_object($this->_pool[$reference]))

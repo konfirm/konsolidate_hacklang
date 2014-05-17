@@ -1,7 +1,7 @@
 <?hh  //  strict
 
 //  NOTE: You will need at least HipHop VM 3.1.0-dev+2014.05.06 in order to use CoreTemplate (and its child modules)
-//        This is due to an issue in version up to and including HipHop VM 3.0.1, where insertNode would raise a fatal
+//        This is due to an issue in version up to and including HipHop VM 3.0.1, where insertBefore would raise a fatal
 //        error: "Unexpected object type stdClass."
 
 
@@ -53,6 +53,9 @@ class CoreTemplate<Konsolidate> extends Konsolidate
 		$this->_namespace      = $this->_getNamespace();
 		$this->_feature        = Array();
 		$this->_child          = Array();
+
+		if (!defined('HHVM_VERSION') || version_compare(HHVM_VERSION, '3.0.1', '<='))
+			trigger_error('CoreTemplate will not function property in HHVM releases up to and including 3.0.1, you have ' . HHVM_VERSION, E_USER_ERROR);
 
 		$filters = $this->get('/Config/Template/filters', 'comment, whitespace');
 		//  if filters are set (read: not explicitly turned off) and this template instance has no parent template, hook the filters to the PHASE_RENDER phase
