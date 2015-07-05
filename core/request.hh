@@ -8,8 +8,7 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreRequest<Konsolidate> extends Konsolidate
-{
+class CoreRequest<Konsolidate> extends Konsolidate {
 	/**
 	 *  CoreRequest constructor
 	 *  @name    __construct
@@ -19,8 +18,7 @@ class CoreRequest<Konsolidate> extends Konsolidate
 	 *  @return  object
 	 *  @note    This object is constructed by one of Konsolidates modules
 	 */
-	public function __construct(Konsolidate $parent)
-	{
+	public function __construct(Konsolidate $parent) {
 		parent::__construct($parent);
 
 		$this->_collect();
@@ -33,8 +31,7 @@ class CoreRequest<Konsolidate> extends Konsolidate
 	 *  @access  public
 	 *  @return  bool
 	 */
-	public function isGet():bool
-	{
+	public function isGet():bool {
 		return isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'GET';
 	}
 
@@ -45,8 +42,7 @@ class CoreRequest<Konsolidate> extends Konsolidate
 	 *  @access  public
 	 *  @return  bool
 	 */
-	public function isPost():bool
-	{
+	public function isPost():bool {
 		return isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST';
 	}
 
@@ -57,8 +53,7 @@ class CoreRequest<Konsolidate> extends Konsolidate
 	 *  @access  public
 	 *  @returns bool
 	 */
-	public function isPut():bool
-	{
+	public function isPut():bool {
 		return isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'PUT';
 	}
 
@@ -69,8 +64,7 @@ class CoreRequest<Konsolidate> extends Konsolidate
 	 *  @access  public
 	 *  @returns bool
 	 */
-	public function isDelete():bool
-	{
+	public function isDelete():bool {
 		return isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'DELETE';
 	}
 
@@ -86,28 +80,26 @@ class CoreRequest<Konsolidate> extends Konsolidate
 	 *  @return  mixed
 	 *  @note    supplying a default value should be done per call, the default is never stored
 	 */
-	public function get():mixed
-	{
+	public function get():mixed {
 		$arg       = func_get_args();
 		$key       = array_shift($arg);
 		$default   = count($arg) ? array_shift($arg) : null;
 		$seperator = strrpos($key, static::MODULE_SEPARATOR);
 
-		if ($seperator !== false && ($module = $this->getModule(substr($key, 0, $seperator))) !== false)
-		{
-			return $module->get(substr($key, $seperator + 1), $default);
+		if ($seperator !== false && ($module = $this->getModule(substr($key, 0, $seperator))) !== false) {
+			$result = $module->get(substr($key, $seperator + 1), $default);
 		}
-		else if ($this->{$_SERVER['REQUEST_METHOD']} && isset($this->{$_SERVER['REQUEST_METHOD']}->{$key}))
-		{
-			return $this->{$_SERVER['REQUEST_METHOD']}->{$key};
+		else if ($this->{$_SERVER['REQUEST_METHOD']} && isset($this->{$_SERVER['REQUEST_METHOD']}->{$key})) {
+			$result = $this->{$_SERVER['REQUEST_METHOD']}->{$key};
 		}
-		else if ($this->checkModuleAvailability($key))
-		{
-			return $this->register($key);
+		else if ($this->checkModuleAvailability($key)) {
+			$result = $this->register($key);
 		}
-		$return = $this->$key;
+		else {
+			$result = $this->$key;
+		}
 
-		return is_null($return) ? $default : $return; // can (and will be by default!) still be null
+		return is_null($result) ? $default : $result; // can (and will be by default!) still be null
 	}
 
 	/**
@@ -119,10 +111,8 @@ class CoreRequest<Konsolidate> extends Konsolidate
 	 *  @param   mixed    param N
 	 *  @return  object
 	 */
-	public function instance($module)
-	{
-		switch ($module)
-		{
+	public function instance($module) {
+		switch ($module) {
 			case 'GET':
 			case 'POST':
 			case 'PUT':
@@ -134,6 +124,7 @@ class CoreRequest<Konsolidate> extends Konsolidate
 				break;
 		}
 		$arg = func_get_args();
+
 		return call_user_func_array(Array('parent', 'instance'), $arg);
 	}
 
@@ -144,12 +135,10 @@ class CoreRequest<Konsolidate> extends Konsolidate
 	 *  @access  protected
 	 *  @return  void
 	 */
-	protected function _collect():void
-	{
+	protected function _collect():void {
 		$method = $_SERVER['REQUEST_METHOD'];
 
-		switch ($method)
-		{
+		switch ($method) {
 			case 'POST':
 			case 'PUT':
 			case 'DELETE':
@@ -170,23 +159,19 @@ class CoreRequest<Konsolidate> extends Konsolidate
 
 
 	/*  ArrayAccess implementation */
-	public function offsetGet($offset)
-	{
+	public function offsetGet($offset) {
 		return $this->$offset;
 	}
 
-	public function offsetSet($offset, $value)
-	{
+	public function offsetSet($offset, $value) {
 		return $this->$offset = $value;
 	}
 
-	public function offsetExists($offset)
-	{
+	public function offsetExists($offset) {
 		return isset($this->$offset);
 	}
 
-	public function offsetUnset($offset)
-	{
+	public function offsetUnset($offset) {
 		unset($this->$offset);
 	}
 }

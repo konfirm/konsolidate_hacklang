@@ -7,8 +7,7 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreTemplateEntityNumeric<Konsolidate> extends Konsolidate
-{
+class CoreTemplateEntityNumeric<Konsolidate> extends Konsolidate {
 	static public Map $resolve = Map {
 		'excl' => 33, //  exclamation mark
 		'quot' => 34, //  quotation mark
@@ -2049,8 +2048,7 @@ class CoreTemplateEntityNumeric<Konsolidate> extends Konsolidate
 	 *  @param  string entity
 	 *  @return string value
 	 */
-	public function get(string $property, string $default=null):mixed
-	{
+	public function get(string $property, string $default=null):mixed {
 		return isset(static::$resolve[$property]) ? static::$resolve[$property] : parent::get($property, $default);
 	}
 }

@@ -7,8 +7,7 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreTemplateEntity<Konsolidate> extends Konsolidate
-{
+class CoreTemplateEntity<Konsolidate> extends Konsolidate {
 	/**
 	 *  Convert given entity to its UTF-8 character
 	 *  @name   utf8
@@ -17,8 +16,7 @@ class CoreTemplateEntity<Konsolidate> extends Konsolidate
 	 *  @param  string entity
 	 *  @return string UTF-8 character
 	 */
-	public function utf8(string $entity):string
-	{
+	public function utf8(string $entity):string {
 		return $this->call('UTF8/get', $this->_entityName($entity), $entity);
 	}
 
@@ -30,11 +28,12 @@ class CoreTemplateEntity<Konsolidate> extends Konsolidate
 	 *  @param  string entity
 	 *  @return string numeric (decimal) entity
 	 */
-	public function dec(string $entity):string
-	{
+	public function dec(string $entity):string {
 		$dec = $this->numeric($entity);
-		if (!empty($dec))
+		if (!empty($dec)) {
 			return '&#' . $dec . ';';
+		}
+
 		return $entity;
 	}
 
@@ -46,11 +45,12 @@ class CoreTemplateEntity<Konsolidate> extends Konsolidate
 	 *  @param  string entity
 	 *  @return string numeric (hexadecimal) entity
 	 */
-	public function hex(string $entity):string
-	{
+	public function hex(string $entity):string {
 		$dec = $this->numeric($entity);
-		if (!empty($dec))
+		if (!empty($dec)) {
 			return '&#x' . dechex($dec) . ';';
+		}
+
 		return $entity;
 	}
 
@@ -62,8 +62,7 @@ class CoreTemplateEntity<Konsolidate> extends Konsolidate
 	 *  @param  string entity
 	 *  @return number entity value
 	 */
-	public function numeric(string $entity):int
-	{
+	public function numeric(string $entity):int {
 		return $this->call('Numeric/get', $this->_entityName($entity));
 	}
 
@@ -75,8 +74,7 @@ class CoreTemplateEntity<Konsolidate> extends Konsolidate
 	 *  @param  string entity
 	 *  @return string entity name
 	 */
-	protected function _entityName(string $entity):string
-	{
+	protected function _entityName(string $entity):string {
 		return preg_replace('/[^a-zA-Z]/', '', $entity);
 	}
 }

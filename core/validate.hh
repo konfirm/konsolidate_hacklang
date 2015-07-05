@@ -1,11 +1,11 @@
 <?hh  //  strict
 
-define('TINYINT_MIN', -128);                // for future reference
-define('TINYINT_MAX',  127);                // for future reference
-define('SMALLINT_MIN', -32768);             // for future reference
-define('SMALLINT_MAX',  32767);             // for future reference
-define('MEDIUMINT_MIN', -8388608);          // for future reference
-define('MEDIUMINT_MAX',  8388607);          // for future reference
+define('TINYINT_MIN', -128);        // for future reference
+define('TINYINT_MAX',  127);        // for future reference
+define('SMALLINT_MIN', -32768);     // for future reference
+define('SMALLINT_MAX',  32767);     // for future reference
+define('MEDIUMINT_MIN', -8388608);  // for future reference
+define('MEDIUMINT_MAX',  8388607);  // for future reference
 define('INT_MIN', -2147483648);
 define('INT_MAX', 2147483647);
 
@@ -17,8 +17,7 @@ define('INT_MAX', 2147483647);
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreValidate<Konsolidate> extends Konsolidate
-{
+class CoreValidate<Konsolidate> extends Konsolidate {
 	/**
 	 *  is the value an integer
 	 *  @name    isInteger
@@ -28,13 +27,13 @@ class CoreValidate<Konsolidate> extends Konsolidate
 	 *  @param   bool  unsigned [optional]
 	 *  @return  bool
 	 */
-	function isInteger(mixed $value, bool $unsigned=false):bool
-	{
+	function isInteger(mixed $value, bool $unsigned=false):bool {
 		$min = $unsigned ? 0 : INT_MIN;
-		$max = $unsigned ? INT_MAX + (-INT_MIN) : INT_MAX; 
+		$max = $unsigned ? INT_MAX + (-INT_MIN) : INT_MAX;
 
-		if (is_null($value) || (!preg_match('/^[0-9]+$/', abs($value))) || $value < $min || $value > $max)
+		if (is_null($value) || (!preg_match('/^[0-9]+$/', abs($value))) || $value < $min || $value > $max) {
 			return false;
+		}
 
 		return true;
 	}
@@ -48,8 +47,7 @@ class CoreValidate<Konsolidate> extends Konsolidate
 	 *  @param   bool  unsigned [optional]
 	 *  @return  bool
 	 */
-	function isPositiveInteger(mixed $value, bool $unsigned=false):bool
-	{
+	function isPositiveInteger(mixed $value, bool $unsigned=false):bool {
 		return ( $this->isInteger($value, $unsigned) && $value >= 0);
 	}
 
@@ -61,8 +59,7 @@ class CoreValidate<Konsolidate> extends Konsolidate
 	 *  @param   mixed value
 	 *  @return  bool
 	 */
-	function isNegativeInteger(mixed $value):bool
-	{
+	function isNegativeInteger(mixed $value):bool {
 		return $this->isInteger($value) && $value < 0;
 	}
 
@@ -74,8 +71,7 @@ class CoreValidate<Konsolidate> extends Konsolidate
 	 *  @param   mixed value
 	 *  @return  bool
 	 */
-	function isNumber(mixed $value):bool
-	{
+	function isNumber(mixed $value):bool {
 		return is_numeric($value);
 	}
 
@@ -90,22 +86,30 @@ class CoreValidate<Konsolidate> extends Konsolidate
 	 *  @param   bool  include min/max values [optional]
 	 *  @return  bool
 	 */
-	function isBetween(mixed $value, int $min=null, int $max=null, bool $inclusive=true):bool
-	{
-		if ($inclusive)
-		{
-			if (!is_null($min))
+	function isBetween(mixed $value, int $min=null, int $max=null, bool $inclusive=true):bool {
+		$result = false;
+
+		if ($inclusive) {
+			if (!is_null($min)) {
 				$min -= 1;
-			if (!is_null($max))
+			}
+
+			if (!is_null($max)) {
 				$max += 1;
+			}
 		}
 
-		if (!is_null($min) && !is_null($max))
-			return $value > $min && $value < $max;
-		else if (!is_null($min))
-			return $value > $min;
-		else if (!is_null($max))
-			return $value < $max;
+		if (!is_null($min) && !is_null($max)) {
+			$result = $value > $min && $value < $max;
+		}
+		else if (!is_null($min)) {
+			$result = $value > $min;
+		}
+		else if (!is_null($max)) {
+			$result = $value < $max;
+		}
+
+		return $result;
 	}
 
 	/**
@@ -116,8 +120,7 @@ class CoreValidate<Konsolidate> extends Konsolidate
 	 *  @param   mixed value
 	 *  @return  bool
 	 */
-	function isFilled(mixed $value):bool
-	{
+	function isFilled(mixed $value):bool {
 		return !preg_match('/^$/', $value);
 	}
 
@@ -130,8 +133,7 @@ class CoreValidate<Konsolidate> extends Konsolidate
 	 *  @return  bool
 	 *  @note    This method does NOT verify the actual existing of the e-mail address, it merely verifies that it complies to common e-mail addresses
 	 */
-	function isEmail($value)
-	{
+	function isEmail($value) {
 		return preg_match('/^[_a-z0-9-]+([a-z0-9\.\+_-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3}|.info)$/i', $value);
 	}
 }

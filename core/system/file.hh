@@ -7,8 +7,7 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreSystemFile<Konsolidate> extends Konsolidate
-{
+class CoreSystemFile<Konsolidate> extends Konsolidate {
 	const SCOPE_PROTECTION = DOCUMENT_ROOT;
 
 	protected $_filepointer;
@@ -21,8 +20,7 @@ class CoreSystemFile<Konsolidate> extends Konsolidate
 	 *  @param   string filename
 	 *  @return  string file contents (bool false on error)
 	 */
-	public function read(string $file):mixed
-	{
+	public function read(string $file):mixed {
 		$this->_verifyScope($file);
 
 		return file_exists($file) && is_readable($file) ? file_get_contents($file) : false;
@@ -37,8 +35,7 @@ class CoreSystemFile<Konsolidate> extends Konsolidate
 	 *  @param   mixed  data [will be cast to string]
 	 *  @return  bool success
 	 */
-	public function write(string $file, mixed $data):bool
-	{
+	public function write(string $file, mixed $data):bool {
 		$this->_verifyScope($file);
 
 		return file_put_contents($file, (string) $data);
@@ -54,8 +51,7 @@ class CoreSystemFile<Konsolidate> extends Konsolidate
 	 *  @return  bool success
 	 *  @note    mode needs be an octal number, eg 0777
 	 */
-	public function mode(string $file, int $mode):bool
-	{
+	public function mode(string $file, int $mode):bool {
 		$this->_verifyScope($file);
 
 		return chmod($file, $mode);
@@ -69,8 +65,7 @@ class CoreSystemFile<Konsolidate> extends Konsolidate
 	 *  @param   string filename
 	 *  @return  bool success
 	 */
-	public function unlink(string $file):bool
-	{
+	public function unlink(string $file):bool {
 		$this->_verifyScope($file);
 
 		return unlink($file);
@@ -86,8 +81,7 @@ class CoreSystemFile<Konsolidate> extends Konsolidate
 	 *  @see     unlink
 	 *  @note    an alias method for unlink
 	 */
-	public function delete(string $file):bool
-	{
+	public function delete(string $file):bool {
 		$this->_verifyScope($file);
 
 		return $this->unlink($file);
@@ -103,8 +97,7 @@ class CoreSystemFile<Konsolidate> extends Konsolidate
 	 *  @param   bool   force(optional, default false)
 	 *  @return  bool success
 	 */
-	public function rename(string $file, string $newFile, bool $force=false):bool
-	{
+	public function rename(string $file, string $newFile, bool $force=false):bool {
 		$this->_verifyScope($file);
 
 		return file_exists($file) && ($force || (!$force && !file_exists($newFile))) ? rename($file, $newFile) : false;
@@ -122,11 +115,11 @@ class CoreSystemFile<Konsolidate> extends Konsolidate
 	 *  @note    Warning: Since you cannot know if your code is the only code currently accessing any file
 	 *           you can best create a unique instance to use this method, obtained through:[KonsolidateObject]->instance("/System/File");
 	 */
-	public function open(string $file, $mode='r'):bool
-	{
+	public function open(string $file, $mode='r'):bool {
 		$this->_verifyScope($file);
 
 		$this->_filepointer = fopen($file, $mode);
+
 		return $this->_filepointer !== false;
 	}
 
@@ -141,15 +134,15 @@ class CoreSystemFile<Konsolidate> extends Konsolidate
 	 *           Warning: Since you cannot know if your code is the only code currently accessing any file
 	 *           you can best create a unique instance to use this method, obtained through:[KonsolidateObject]->instance("/System/File");
 	 */
-	public function get():mixed
-	{
+	public function get():mixed {
 		//  in order to achieve compatiblity with Konsolidates set method, the params are read 'manually'
 		$arg     = func_get_args();
 		$length  = count($arg) ? array_shift($arg) : 4096;
 		$default = count($arg) ? array_shift($arg) : null;
 
-		if (is_integer($length))
+		if (is_integer($length)) {
 			return is_resource($this->_filepointer) && !feof($this->_filepointer) ? fgets($this->_filepointer, $length) : false;
+		}
 
 		return parent::get($length, $default);
 	}
@@ -164,8 +157,7 @@ class CoreSystemFile<Konsolidate> extends Konsolidate
 	 *  @note    Warning: Since you cannot know if your code is the only code currently accessing any file
 	 *           you can best create a unique instance to use this method, obtained through:[KonsolidateObject]->instance("/System/File");
 	 */
-	public function put(mixed $data):bool
-	{
+	public function put(mixed $data):bool {
 		$data = (string) $data;
 
 		return is_resource($this->_filepointer) ? fputs($this->_filepointer, $data, strlen($data)) : false;
@@ -182,8 +174,7 @@ class CoreSystemFile<Konsolidate> extends Konsolidate
 	 *  @note    Warning: Since you cannot know if your code is the only code currently accessing any file
 	 *           you can best create a unique instance to use this method, obtained through:[KonsolidateObject]->instance("/System/File");
 	 */
-	public function next():mixed
-	{
+	public function next():mixed {
 		return $this->get();
 	}
 
@@ -196,8 +187,7 @@ class CoreSystemFile<Konsolidate> extends Konsolidate
 	 *  @note    Warning: Since you cannot know if your code is the only code currently accessing any file
 	 *           you can best create a unique instance to use this method, obtained through:[KonsolidateObject]->instance("/System/File");
 	 */
-	public function close():bool
-	{
+	public function close():bool {
 		return is_resource($this->_filepointer) ? fclose($this->_filepointer) : false;
 	}
 
@@ -210,8 +200,7 @@ class CoreSystemFile<Konsolidate> extends Konsolidate
 	 *  @note    Warning: Since you cannot know if your code is the only code currently accessing any file
 	 *           you can best create a unique instance to use this method, obtained through:[KonsolidateObject]->instance("/System/File");
 	 */
-	public function getFilePointer():resource
-	{
+	public function getFilePointer():resource {
 		return $this->_filepointer;
 	}
 
@@ -224,10 +213,10 @@ class CoreSystemFile<Konsolidate> extends Konsolidate
 	 *  @access  public
 	 *  @return  void
 	 */
-	public function __destruct():void
-	{
-		if (!is_null($this->_filepointer) && is_resource($this->_filepointer))
+	public function __destruct():void {
+		if (!is_null($this->_filepointer) && is_resource($this->_filepointer)) {
 			$this->close();
+		}
 	}
 
 	/**
@@ -237,11 +226,11 @@ class CoreSystemFile<Konsolidate> extends Konsolidate
 	 *  @access  protected
 	 *  @return  void
 	 */
-	protected function _verifyScope(string $file):void
-	{
+	protected function _verifyScope(string $file):void {
 		$protect = static::SCOPE_PROTECTION;
 
-		if ($protect && strpos($file, '/') === 0 && substr($file, 0, strlen($protect)) !== $protect)
+		if ($protect && strpos($file, '/') === 0 && substr($file, 0, strlen($protect)) !== $protect) {
 			$this->exception('File \'' . $file . '\' is not within the bounds of the protected scope: ' . $protect);
+		}
 	}
 }

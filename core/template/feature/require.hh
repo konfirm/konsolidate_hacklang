@@ -7,8 +7,7 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreTemplateFeatureRequire<CoreTemplateFeature> extends CoreTemplateFeature
-{
+class CoreTemplateFeatureRequire<CoreTemplateFeature> extends CoreTemplateFeature {
 	/**
 	 *  Do all preparations needed for the feature to do its deed
 	 *  @name   prepare
@@ -16,13 +15,13 @@ class CoreTemplateFeatureRequire<CoreTemplateFeature> extends CoreTemplateFeatur
 	 *  @access public
 	 *  @return bool success
 	 */
-	public function prepare():bool
-	{
-		if ($this->attribute('file') && !$this->attribute('type'))
-		{
+	public function prepare():bool {
+		if ($this->attribute('file') && !$this->attribute('type')) {
 			$type = $this->_getMIMEType(pathinfo($this->attribute('file'), PATHINFO_EXTENSION));
-			if (!empty($type))
+
+			if (!empty($type)) {
 				$this->attribute('type', $type);
+			}
 		}
 
 		return true;
@@ -36,11 +35,9 @@ class CoreTemplateFeatureRequire<CoreTemplateFeature> extends CoreTemplateFeatur
 	 *  @param  string file extension
 	 *  @return string MIME type (null if not found)
 	 */
-	protected function _getMIMEType(string $extension):string
-	{
+	protected function _getMIMEType(string $extension):string {
 		$type = null;
-		switch ($extension)
-		{
+		switch ($extension) {
 			case 'js':
 				$type = 'text/javascript';
 				break;

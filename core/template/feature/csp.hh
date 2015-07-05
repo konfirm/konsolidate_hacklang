@@ -8,8 +8,7 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreTemplateFeatureCSP<CoreTemplateFeature> extends CoreTemplateFeature
-{
+class CoreTemplateFeatureCSP<CoreTemplateFeature> extends CoreTemplateFeature {
 	protected Map<string, Map> $_policy;
 
 	/**
@@ -19,8 +18,7 @@ class CoreTemplateFeatureCSP<CoreTemplateFeature> extends CoreTemplateFeature
 	 *  @access public
 	 *  @return bool success
 	 */
-	public function prepare():bool
-	{
+	public function prepare():bool {
 		$policyList = Map {
 			'src' => Vector {
 				'default',
@@ -37,9 +35,11 @@ class CoreTemplateFeatureCSP<CoreTemplateFeature> extends CoreTemplateFeature
 			}
 		};
 
-		foreach ($policyList as $type=>$list)
-			foreach ($list->getIterator() as $policy)
+		foreach ($policyList as $type=>$list) {
+			foreach ($list->getIterator() as $policy) {
 				$this->_addPolicy($policy . '-' . $type, isset($this->{$policy}) ? $this->{$policy} : ($policy == 'default' ? 'none' : null), true);
+			}
+		}
 
 		return parent::prepare();
 	}
@@ -51,15 +51,12 @@ class CoreTemplateFeatureCSP<CoreTemplateFeature> extends CoreTemplateFeature
 	 *  @access public
 	 *  @return bool success
 	 */
-	public function render():bool
-	{
+	public function render():bool {
 		//  obtain all required files and process the javascript/stylesheet urls
 		$requires = $this->_template->getFeatures('require', null, true);
-		foreach ($requires as $require)
-		{
+		foreach ($requires as $require) {
 			$type = false;
-			switch ($require->type)
-			{
+			switch ($require->type) {
 				case 'text/css':
 					$this->_addPolicy('style-src', $require->file);
 					break;
@@ -74,16 +71,18 @@ class CoreTemplateFeatureCSP<CoreTemplateFeature> extends CoreTemplateFeature
 		$this->_optimizePolicy();
 
 		//  if there are any policy rules, create the header contents
-		if (count($this->_policy))
-		{
+		if (count($this->_policy)) {
 			$content = '';
-			foreach ($this->_policy as $type=>$sources)
-				if (count($sources))
+			foreach ($this->_policy as $type=>$sources) {
+				if (count($sources)) {
 					$content .= (!empty($content) ? '; ' : '') . $type . ' ' . implode(' ', array_keys($sources));
+				}
+			}
 
 			//  send the headers if header content was created
-			if (!empty($content))
+			if (!empty($content)) {
 				$this->_sendHeader($content);
+			}
 		}
 
 		//  let the parent class clean up the feature node
@@ -98,10 +97,10 @@ class CoreTemplateFeatureCSP<CoreTemplateFeature> extends CoreTemplateFeature
 	 *  @param  string policy domain
 	 *  @return string policy
 	 */
-	protected function _getDomain(string $input):?string
-	{
-		if (empty($input))
+	protected function _getDomain(string $input):?string {
+		if (empty($input)) {
 			return;
+		}
 
 		$keyword = Array(
 			//  data-urls
@@ -119,35 +118,38 @@ class CoreTemplateFeatureCSP<CoreTemplateFeature> extends CoreTemplateFeature
 		);
 		$url = parse_url($input);
 
-		if (isset($url['path']))
-		{
-			if (isset($url['host']))
+		if (isset($url['path'])) {
+			if (isset($url['host'])) {
 				return $url['host'];
+			}
 
 			//  keyword in path
-			else if (in_array($url['path'], $keyword))
+			else if (in_array($url['path'], $keyword)) {
 				return $url['path'];
+			}
 
 			//  keyword in scheme (data)
-			else if (isset($url['scheme']) && in_array($url['scheme'], $keyword))
+			else if (isset($url['scheme']) && in_array($url['scheme'], $keyword)) {
 				return $url['scheme'];
+			}
 
 			//  domains
-			else if (preg_match('/^(\*\.)?[a-z][a-z0-9_\-\.]+\.[a-z]{2,6}$/', $url['path']))
+			else if (preg_match('/^(\*\.)?[a-z][a-z0-9_\-\.]+\.[a-z]{2,6}$/', $url['path'])) {
 				return $url['path'];
+			}
 
 			//  protocol-less domain and plain host names
-			if (preg_match('/^(\/\/)?[a-z].*[^\/]$/', $url['path'], $match))
-			{
+			if (preg_match('/^(\/\/)?[a-z].*[^\/]$/', $url['path'], $match)) {
 				$url = parse_url('http' . (isset($_SERVER['HTTPS']) ? 's' : '') . ':' . $url['path']);
-				if (isset($url['host']))
+				if (isset($url['host'])) {
 					return $url['host'];
+				}
 			}
 		}
-		else if (isset($url['host']))
-		{
+		else if (isset($url['host'])) {
 			return $url['host'];
 		}
+
 		return 'self';
 	}
 
@@ -159,13 +161,12 @@ class CoreTemplateFeatureCSP<CoreTemplateFeature> extends CoreTemplateFeature
 	 *  @param  string rule
 	 *  @return string rule
 	 */
-	protected function _quoteRule(string $rule):string
-	{
-		if (isset($_SERVER['SERVER_NAME']) && $rule == $_SERVER['SERVER_NAME'])
+	protected function _quoteRule(string $rule):string {
+		if (isset($_SERVER['SERVER_NAME']) && $rule == $_SERVER['SERVER_NAME']) {
 			$rule = 'self';
+		}
 
-		switch ($rule)
-		{
+		switch ($rule) {
 			case 'data':
 				$rule .= ':';
 				break;
@@ -190,22 +191,22 @@ class CoreTemplateFeatureCSP<CoreTemplateFeature> extends CoreTemplateFeature
 	 *  @param  string rules
 	 *  @return void
 	 */
-	protected function _addPolicy(string $policy, ?string $rules):void
-	{
+	protected function _addPolicy(string $policy, ?string $rules):void {
 		$ruleList = explode(' ', $rules ?: '');
-		if (count($ruleList))
-		{
-			if (!is_array($this->_policy))
+		if (count($ruleList)) {
+			if (!is_array($this->_policy)) {
 				$this->_policy = Array();
+			}
 
-			if (!isset($this->_policy[$policy]))
+			if (!isset($this->_policy[$policy])) {
 				$this->_policy[$policy] = Array();
+			}
 
-			foreach ($ruleList as $rule)
-			{
+			foreach ($ruleList as $rule) {
 				$rule = $this->_quoteRule($this->_getDomain($rule) ?: '');
-				if (!empty($rule))
+				if (!empty($rule)) {
 					$this->_policy[$policy][$rule] = true;
+				}
 			}
 		}
 	}
@@ -217,40 +218,40 @@ class CoreTemplateFeatureCSP<CoreTemplateFeature> extends CoreTemplateFeature
 	 *  @access protected
 	 *  @return void
 	 */
-	protected function _optimizePolicy():void
-	{
+	protected function _optimizePolicy():void {
 		$wildcard = '/^[a-z0-9\._-]+(\.[a-z]\w+\.[a-z]{2,6})$/';
 		$default  = $this->_policy['default-src'];
 		ksort($default);
 		foreach ($this->_policy as $type=>$list)
-			if ($type !== 'default-src')
-			{
+			if ($type !== 'default-src') {
 				ksort($list);
-				if ($default == $list || count($list) <= 0)
-				{
+				if ($default == $list || count($list) <= 0) {
 					unset($this->_policy[$type]);
 				}
-				else
-				{
+				else {
 					//  remove duplicates (and wilcard matches)
-					foreach ($list as $host=>$enabled)
-						if (!$enabled)
+					foreach ($list as $host=>$enabled) {
+						if (!$enabled) {
 							unset($this->_policy[$type][$host]);
-						else if (preg_match($wildcard, $host, $match) && isset($list['*' . $match[1]]))
+						}
+						else if (preg_match($wildcard, $host, $match) && isset($list['*' . $match[1]])) {
 							unset($this->_policy[$type][$host]);
+						}
+					}
 
 					//  determine if all of the rules are already covered by the default policy
 					$allDefault = true;
-					foreach ($this->_policy[$type] as $host=>$enabled)
-						if (!isset($default[$host]) && (!preg_match($wildcard, $host, $match) || !isset($default['*' . $match[1]])))
-						{
+					foreach ($this->_policy[$type] as $host=>$enabled) {
+						if (!isset($default[$host]) && (!preg_match($wildcard, $host, $match) || !isset($default['*' . $match[1]]))) {
 							$allDefault = false;
 							break;
 						}
+					}
 
 					//  if all rules are covered by the default policy, we don't need to set it
-					if ($allDefault)
+					if ($allDefault) {
 						unset($this->_policy[$type]);
+					}
 				}
 			}
 	}
@@ -263,18 +264,15 @@ class CoreTemplateFeatureCSP<CoreTemplateFeature> extends CoreTemplateFeature
 	 *  @param  string policy header
 	 *  @return void
 	 */
-	protected function _sendHeader(string $content):void
-	{
+	protected function _sendHeader(string $content):void {
 		//  default to the most recent header version
 		$header = 'Content-Security-Policy';
 		$agent  = $this->call('/Tool/serverVal', 'HTTP_USER_AGENT');
 
 		//  A crude form of User-Agent based browser detection
-		if (!empty($agent) && preg_match_all('/(?:(?:firefox|chrome|safari|msie|version|gecko|webkit|trident)[\/ ][0-9\.]+)/i', $agent, $match))
-		{
+		if (!empty($agent) && preg_match_all('/(?:(?:firefox|chrome|safari|msie|version|gecko|webkit|trident)[\/ ][0-9\.]+)/i', $agent, $match)) {
 			$version = (object) Array();
-			foreach ($match[0] as $part)
-			{
+			foreach ($match[0] as $part) {
 				list($key, $value) = explode('/', $part, 2);
 				$version->{strtolower($key)} = $value;
 			}
@@ -290,21 +288,17 @@ class CoreTemplateFeatureCSP<CoreTemplateFeature> extends CoreTemplateFeature
 			//  Any user-agent unmatched by the criteria below will receive the Content-Security-Policy header
 
 			//  All versions of IE > 10 and Firefox up to 22 need the X- prefixed header
-			if (isset($version->msie) || (isset($version->firefox) && $version->firefox < 23))
-			{
+			if (isset($version->msie) || (isset($version->firefox) && $version->firefox < 23)) {
 				$header = 'X-' . $header;
 				//  As Firefox implemented their initial CSP spec, we need to reflect the original
 				//  policy rules (pre-w3 spec)
-				if (isset($version->firefox))
-				{
+				if (isset($version->firefox)) {
 					//  connect-src is called xhr-src (and only applies to XMLHTTPRequest
 					$content = str_replace('connect-src', 'xhr-src', $content);
-					if (preg_match('/script-src.*?;/i', $content, $scriptMatch) &&  preg_match_all('/(\'unsafe-(?:eval|inline)\')/', $scriptMatch[0], $match))
-					{
+					if (preg_match('/script-src.*?;/i', $content, $scriptMatch) &&  preg_match_all('/(\'unsafe-(?:eval|inline)\')/', $scriptMatch[0], $match)) {
 						$options = Array();
 						$script  = $scriptMatch[0];
-						foreach ($match[0] as $option)
-						{
+						foreach ($match[0] as $option) {
 							$script    = str_replace($option, '', $script);
 							$options[] = preg_replace('/\'unsafe-([a-z]+)\'/', '\\1-script', $option);
 						}
@@ -315,12 +309,12 @@ class CoreTemplateFeatureCSP<CoreTemplateFeature> extends CoreTemplateFeature
 			}
 
 			//  All versions of Safari and Chrome up to 24 need the X-Webkit-CSP header
-			else if (isset($version->webkit) && (!isset($version->chrome) || $version->chrome < 25))
-			{
+			else if (isset($version->webkit) && (!isset($version->chrome) || $version->chrome < 25)) {
 				$header = 'X-Webkit-CSP';
 			}
 		}
-		if (!headers_sent())
+		if (!headers_sent()) {
 			header($header . ': ' . $content);
+		}
 	}
 }

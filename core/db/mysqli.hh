@@ -7,8 +7,7 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreDBMySQLi<Konsolidate> extends Konsolidate
-{
+class CoreDBMySQLi<Konsolidate> extends Konsolidate {
 	/**
 	 *  The connection URI (parsed url)
 	 *  @name    _URI
@@ -67,8 +66,7 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 	 *  @returns object
 	 *  @note    This object is constructed by one of Konsolidates modules
 	 */
-	public function __construct(Konsolidate $parent)
-	{
+	public function __construct(Konsolidate $parent) {
 		parent::__construct($parent);
 
 		$this->_URI         = null;
@@ -93,14 +91,15 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 	 *  @param   string DSN URI
 	 *  @returns bool
 	 */
-	public function setConnection(string $uri):bool
-	{
+	public function setConnection(string $uri):bool {
 		$this->_URI = Map::fromArray(parse_url($uri));
 
-		if (!$this->_URI->contains('host'))
+		if (!$this->_URI->contains('host')) {
 			$this->exception('Missing required host from the MySQLi DSN "' . $uri . '"');
-        else if (!$this->_URI->contains('user'))
+		}
+        else if (!$this->_URI->contains('user')) {
 			$this->exception('Missing required username from the MySQLi DSN "' . $uri . '""');
+		}
 
 		return true;
 	}
@@ -114,20 +113,19 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 	 *  @note    An explicit call to this method is not required, since the query method will create the connection if
      *           it isn't connected
 	 */
-	public function connect():bool
-	{
-		if (!$this->isConnected())
-		{
+	public function connect():bool {
+		if (!$this->isConnected()) {
 			$this->_conn = new MySQLi(
-                $this->_URI->get('host'),
-                $this->_URI->get('user'),
-                $this->_URI->get('pass') ?: '',
-                trim($this->_URI->get('path'), '/'),
-                $this->_URI->get('port') ?: 3306
+				$this->_URI->get('host'),
+				$this->_URI->get('user'),
+				$this->_URI->get('pass') ?: '',
+				trim($this->_URI->get('path'), '/'),
+				$this->_URI->get('port') ?: 3306
 			);
 
-			if ($this->_conn->connect_error)
+			if ($this->_conn->connect_error) {
 				$this->exception($this->_conn->connect_error, $this->_conn->connect_errno);
+			}
 		}
 
 		return true;
@@ -140,12 +138,8 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 	 *  @access  public
 	 *  @returns bool
 	 */
-	public function disconnect():bool
-	{
-		if ( $this->isConnected() )
-			return $this->_conn->close();
-
-		return true;
+	public function disconnect():bool {
+		return $this->isConnected() ? $this->_conn->close() : true;
 	}
 
 	/**
@@ -155,8 +149,7 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 	 *  @access  public
 	 *  @returns bool
 	 */
-	public function isConnected():bool
-	{
+	public function isConnected():bool {
 		return is_object($this->_conn);
 	}
 
@@ -172,26 +165,26 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 	 *  @returns object result
 	 *  @note    Requesting extended information will automatically enable normal info aswel
 	 */
-	public function query(string $query, bool $cache=true, bool $info=false, bool $extendedInfo=false):?CoreDBMySQLiQuery
-	{
+	public function query(string $query, bool $cache=true, bool $info=false, bool $extendedInfo=false):?CoreDBMySQLiQuery {
 		$cacheKey = md5($query);
-		if ($cache && $this->_cache->contains($cacheKey))
-		{
+
+		if ($cache && $this->_cache->contains($cacheKey)) {
             $result = $this->_cache->get($cacheKey);
 			$result->rewind();
 			$result->cached = true;
+
 			return $result;
 		}
 
-		if ($this->connect())
-		{
+		if ($this->connect()) {
 			$result = $this->instance('Query');
 			$result->execute($query, $this->_conn);
 			$result->info   = $info || $extendedInfo ? $this->info($extendedInfo, Array('duration' => $result->duration)) : 'additional query info not processed';
 			$result->cached = false;
 
-			if ($cache && $this->_isCachableQuery($query))
+			if ($cache && $this->_isCachableQuery($query)) {
 				$this->_cache->set($cacheKey, $result);
+			}
 
 			return $result;
 		}
@@ -209,8 +202,7 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 	 *  @param   bool     strip escaped names (default false)
 	 *  @returns string   fingerprint
 	 */
-	public function fingerprint(string $query, bool $hash=true, bool $stripName=false, Map<string, string> $replace=Map {}):string
-	{
+	public function fingerprint(string $query, bool $hash=true, bool $stripName=false, Map<string, string> $replace=Map {}):string {
 		$replace = array_merge($this->_fingerprintreplacement, $replace);
 		$string  = $replace->get('string');
 		$number  = $replace->get('number');
@@ -228,8 +220,9 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 			"/\s+/"=>" "                                                 //  replace (multiple) whitespace chars by space
 		);
 
-		if ( $stripName )
+		if ( $stripName ) {
 			$replace->set('/`.*?`/', $names);
+		}
 		$result = trim(preg_replace($replace->keys(), $replace->values(), $query));
 
 		return $hash ? md5($result) : $result;
@@ -242,8 +235,7 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 	 *  @access  public
 	 *  @returns int id
 	 */
-	public function lastInsertID():?int
-	{
+	public function lastInsertID():?int {
         return $this->isConnected() ? mysqli_insert_id($this->_conn) : null;
 	}
 
@@ -256,8 +248,7 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 	 *  @note    alias for lastInsertID
 	 *  @see     lastInsertID
 	 */
-	public function lastId():?int
-	{
+	public function lastId():?int {
 		return $this->lastInsertID();
 	}
 
@@ -269,10 +260,10 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 	 *  @param   string input
 	 *  @returns string escaped input
 	 */
-	public function escape(string $string):string
-	{
-		if ($this->connect())
+	public function escape(string $string):string {
+		if ($this->connect()) {
 			return mysqli_real_escape_string($this->_conn, $string);
+		}
 
 		$this->call('/Log/write', get_class($this) . '::escape, could not escape string');
 
@@ -287,8 +278,7 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 	 *  @param   string input
 	 *  @returns string quoted escaped input
 	 */
-	public function quote(string $string):string
-	{
+	public function quote(string $string):string {
 		return '"' . $this->escape($string) . '"';
 	}
 
@@ -299,10 +289,10 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 	 *  @access  public
 	 *  @returns bool success
 	 */
-	public function startTransaction():bool
-	{
-		if ($this->connect() && !$this->_transaction)
+	public function startTransaction():bool {
+		if ($this->connect() && !$this->_transaction) {
 			$this->_transaction = $this->_conn->autocommit(false);
+		}
 
 		return $this->_transaction;
 	}
@@ -316,10 +306,10 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 	 *  @returns bool success
 	 *  @note    if argument 'commit' is true, 'COMMIT' is sent, 'ROLLBACK' otherwise
 	 */
-	public function endTransaction($success=true):bool
-	{
-		if ($this->_transaction)
+	public function endTransaction($success=true):bool {
+		if ($this->_transaction) {
 			$this->_transaction = !($success ? $this->_conn->commit() : $this->_conn->rollback());
+		}
 
 		return !$this->_transaction;
 	}
@@ -332,8 +322,7 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 	 *  @returns bool success
 	 *  @note    same as endTransaction( true );
 	 */
-	public function commitTransaction():bool
-	{
+	public function commitTransaction():bool {
 		return $this->endTransaction(true);
 	}
 
@@ -345,8 +334,7 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 	 *  @returns bool success
 	 *  @note    same as endTransaction( false );
 	 */
-	public function rollbackTransaction():bool
-	{
+	public function rollbackTransaction():bool {
 		return $this->endTransaction(false);
 	}
 
@@ -358,8 +346,7 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 	 *  @access  public
 	 *  @returns string characterset
 	 */
-	public function characterSetName():string
-	{
+	public function characterSetName():string {
 		return $this->_conn->character_set_name();
 	}
 
@@ -371,10 +358,10 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 	 *  @param   bool  versionstring [optional, default false]
 	 *  @returns mixed version
 	 */
-	public function clientVersion(bool $versionString=false):mixed
-	{
-		if ($versionString)
+	public function clientVersion(bool $versionString=false):mixed {
+		if ($versionString) {
 			return $this->_versionToString($this->_conn->client_version);
+		}
 
 		return $this->_conn->client_version;
 	}
@@ -388,8 +375,7 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 	 *  @note    the client info may appear to be the version as string, but can contain additional build information,
      *           use clientVersion( true ) for fool-proof string version comparing
 	 */
-	public function clientInfo():string
-	{
+	public function clientInfo():string {
 		return $this->_conn->client_info;
 	}
 
@@ -401,13 +387,14 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 	 *  @param   bool  versionstring [optional, default false]
 	 *  @returns mixed version (false if a connection could not be established)
 	 */
-	public function serverVersion($versionString=false):mixed
-	{
-		if (!$this->connect())
+	public function serverVersion($versionString=false):mixed {
+		if (!$this->connect()) {
 			return false;
+		}
 
-		if ($versionString)
+		if ($versionString) {
 			return $this->_versionToString($this->_conn->server_version);
+		}
 
 		return $this->_conn->server_version;
 	}
@@ -421,8 +408,7 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 	 *  @note    the server info may appear to be the version as string, but can contain additional build information,
      *           use serverVersion( true ) for fool-proof string version comparing
 	 */
-	public function serverInfo():string
-	{
+	public function serverInfo():string {
 		return $this->_conn->server_info;
 	}
 
@@ -435,8 +421,7 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 	 *  @returns object info
 	 *  @note    by requesting extended info, the connection stats are added to the info object
 	 */
-	public function info(bool $extendInfo=false, Array $appendInfo=null):CoreDBMySQLiInfo
-	{
+	public function info(bool $extendInfo=false, Array $appendInfo=null):CoreDBMySQLiInfo {
 		$result = $this->instance('Info');
 		$result->process($this->_conn, $extendInfo, $appendInfo);
 
@@ -451,8 +436,7 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 	 *  @param   int    version
 	 *  @returns string version
 	 */
-	protected function _versionToString(int $version):string
-	{
+	protected function _versionToString(int $version):string {
 		$major = round($version / 10000);
 		$minor = round(($version - ($major * 10000)) / 100);
 
@@ -467,8 +451,7 @@ class CoreDBMySQLi<Konsolidate> extends Konsolidate
 	 *  @param   string query
 	 *  @returns bool   success
 	 */
-	protected function _isCachableQuery($query):bool
-	{
+	protected function _isCachableQuery($query):bool {
 		return (bool) preg_match('/^\s*SELECT /i', $query);
 	}
 }

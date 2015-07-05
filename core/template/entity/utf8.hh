@@ -7,8 +7,7 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreTemplateEntityUTF8<Konsolidate> extends Konsolidate
-{
+class CoreTemplateEntityUTF8<Konsolidate> extends Konsolidate {
 	static public Map<string, string> $resolve = Map {
 		'excl' => '!', //  exclamation mark
 		'quot' => '"', //  quotation mark
@@ -2049,8 +2048,7 @@ class CoreTemplateEntityUTF8<Konsolidate> extends Konsolidate
 	 *  @param  string entity
 	 *  @return string value
 	 */
-	public function get(string $property, string $default):string
-	{
+	public function get(string $property, string $default):string {
 		return static::$resolve->get($property) ?: parent::get($property, $default);
 	}
 }

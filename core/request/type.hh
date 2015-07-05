@@ -7,63 +7,20 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreRequestType extends Konsolidate implements ArrayAccess
-{
-	protected bool $_protect;
-	protected bool $_verify;
-	protected string $_type;
-	protected Map<string, string> $_original;
+class CoreRequestType extends Konsolidate implements ArrayAccess {
+	protected $_protect;
+	protected $_verify;
+	protected $_type;
 
 
-	public function __construct(Konsolidate $parent, ?string $type=null)
-	{
+	public function __construct(Konsolidate $parent, ?string $type=null) {
 		parent::__construct($parent);
 
-		$this->_type     = strToLower($type ?: $_SERVER['REQUEST_METHOD']);
-		$this->_protect  = $this->get('/Config/Request/protect_' . $this->_type, $this->get('/Config/Request/protect', true));
-		$this->_verify   = $this->get('/Config/Request/verify_' . $this->_type, $this->get('/Config/Request/verify', true));
-		$this->_original = Map<string, Map> {};
+		$this->_type    = strToLower($type ?: $_SERVER['REQUEST_METHOD']);
+		$this->_protect = $this->get('/Config/Request/protect_' . $this->_type, $this->get('/Config/Request/protect', true));
+		$this->_verify  = $this->get('/Config/Request/verify_' . $this->_type, $this->get('/Config/Request/verify', true));
 
 		$this->_collect();
-	}
-
-	/**
-	 *  Obtain a Map containing the original value (as it was processed by the native code) and all the keys leading to this value
-	 *  @name    original
-	 *  @type    method
-	 *  @access  public
-	 *  @param   string key
-	 *  @return  Map<string, mixed>
-	 */
-	public function original(string $key):Map<string, mixed>
-	{
-		var_dump($key, $this->_original->get($key));
-
-		return $this->_original->get($key);
-	}
-
-	/**
-	 *  Obtain a Vector of all keys of which more than one existed in the buffer
-	 *  @name    suspect
-	 *  @type    method
-	 *  @access  public
-	 *  @return  Vector<string>
-	 */
-	public function suspect():Vector<string>
-	{
-		$result = Vector<string> {};
-
-		foreach ($this->_original as $key=>$value)
-		{
-			$raw = $value->get('raw');
-			if (count($raw) > 1)
-				foreach ($raw as $variable)
-					if ($variable->get('key') !== $key)
-						$result->add($key);
-		}
-
-
-		return $result;
 	}
 
 	/**
@@ -75,10 +32,10 @@ class CoreRequestType extends Konsolidate implements ArrayAccess
 	 *  @param   mixed  value
 	 *  @return  void
 	 */
-	public function __set(string $name, mixed $value):void
-	{
-		if ($this->_protect)
+	public function __set(string $name, mixed $value):void {
+		if ($this->_protect) {
 			return $this->call('/Log/message', __METHOD__ . ' not allowed to modify ' . strToUpper($this->_type) . ' request variables', 2);
+		}
 
 		return parent::__set($name, $value);
 	}
@@ -92,16 +49,8 @@ class CoreRequestType extends Konsolidate implements ArrayAccess
 	 *  @param   string  buffer (to verify against)
 	 *  @return  void
 	 */
-	protected function _populate(array $collection, string $buffer=null):void
-	{
-		foreach ($collection as $key=>$value)
-		{
-			$check = Map<string, mixed> {
-				'value' => $value,
-				'raw'   => $this->call('/Input/Verify/bufferKey', $buffer, $key)
-			};
-
-			$this->_original->add(Pair {$key, $check});
+	protected function _populate(array $collection, string $buffer=null):void {
+		foreach ($collection as $key=>$value) {
 			$this->_property[$key] = $this->_verify ? $this->call('/Input/Verify/bufferValue', $buffer, $key, $value) : $value;
 		}
 	}
@@ -113,17 +62,14 @@ class CoreRequestType extends Konsolidate implements ArrayAccess
 	 *  @access  protected
 	 *  @return  void
 	 */
-	protected function _collect():void
-	{
+	protected function _collect():void {
 		//  determine the collection and try to populate it's properties
-		switch ($this->_type)
-		{
+		switch ($this->_type) {
 			//  use PHP's built-in _GET and/or _POST superglobals, override after copying
 			case 'get':
 			case 'post':
 				$super = '_' . strToUpper($this->_type);
-				if (isset($GLOBALS[$super]) && is_array($GLOBALS[$super]))
-				{
+				if (isset($GLOBALS[$super]) && is_array($GLOBALS[$super])) {
 					$buffer = $this->_type === 'get' ? $this->call('/Tool/serverVal', 'QUERY_STRING') : trim(file_get_contents('php://input'));
 					$this->_populate($GLOBALS[$super], $buffer);
 				}
@@ -135,11 +81,9 @@ class CoreRequestType extends Konsolidate implements ArrayAccess
 			case 'put':
 			case 'delete':
 				$super = '_' . strToUpper($this->_type);
-				if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == strToUpper($this->_type))
-				{
+				if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == strToUpper($this->_type)) {
 					$raw = trim(file_get_contents("php://input"));
-					if (!empty($raw))
-					{
+					if (!empty($raw)) {
 						parse_str($raw, $temp);
 						$this->_populate($temp, $raw);
 					}
@@ -155,23 +99,19 @@ class CoreRequestType extends Konsolidate implements ArrayAccess
 	}
 
 	/*  ArrayAccess implementation */
-	public function offsetGet(mixed $offset):mixed
-	{
+	public function offsetGet(mixed $offset):mixed {
 		return $this->{$offset};
 	}
 
-	public function offsetSet(mixed $offset, mixed $value):mixed
-	{
+	public function offsetSet(mixed $offset, mixed $value):mixed {
 		return $this->{$offset} = $value;
 	}
 
-	public function offsetExists(mixed $offset):bool
-	{
+	public function offsetExists(mixed $offset):bool {
 		return isset($this->{$offset});
 	}
 
-	public function offsetUnset(mixed $offset):void
-	{
+	public function offsetUnset(mixed $offset):void {
 		unset($this->{$offset});
 	}
 }

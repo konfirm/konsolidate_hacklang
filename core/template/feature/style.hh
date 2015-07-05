@@ -7,8 +7,7 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreTemplateFeatureStyle<CoreTemplateFeature> extends CoreTemplateFeature
-{
+class CoreTemplateFeatureStyle<CoreTemplateFeature> extends CoreTemplateFeature {
 	/**
 	 *  Render the feature
 	 *  @name   render
@@ -16,22 +15,21 @@ class CoreTemplateFeatureStyle<CoreTemplateFeature> extends CoreTemplateFeature
 	 *  @access public
 	 *  @return bool success
 	 */
-	public function render():bool
-	{
+	public function render():bool {
         $files    = Map<string, bool> {};
 		$requires = $this->_template->getFeatures('require', Array('type'=>'text/css'), true);
 		$dom      = $this->_getDOMDocument();
 
-		foreach ($requires as $requirement)
-		{
-            //  requirements referencing an external file will be included only once unless the multiple="true" attribute is set
-            if (isset($requirement->file))
-            {
-                if ($files->contains($requirement->file) && $requirement->multiple !== 'true')
-                    continue;
-                else
-                    $files->add(Pair {$requirement->file, true});
-            }
+		foreach ($requires as $requirement) {
+			//  requirements referencing an external file will be included only once unless the multiple="true" attribute is set
+			if (isset($requirement->file)) {
+				if ($files->contains($requirement->file) && $requirement->multiple !== 'true') {
+					continue;
+				}
+				else {
+					$files->add(Pair {$requirement->file, true});
+				}
+			}
 
 			//  if the require feature has been fixated (either the template author added an attribute fixate="true" or
 			//  the feature class was overruled and it was fixated in the extending class), use the require feature
@@ -40,8 +38,7 @@ class CoreTemplateFeatureStyle<CoreTemplateFeature> extends CoreTemplateFeature
 			$offset = $requirement->fixate == 'true' ? $requirement->offsetNode() : $this->_node;
 
 			//  if the requirement has the file property, we need to reference it differently
-			if (isset($requirement->file))
-			{
+			if (isset($requirement->file)) {
 				//  create a link element right before the offset element
 				$node = $offset->parentNode->insertBefore(
 					$dom->createElement('link'),
@@ -51,12 +48,10 @@ class CoreTemplateFeatureStyle<CoreTemplateFeature> extends CoreTemplateFeature
 				$node->setAttribute('type', 'text/css');
 				$node->setAttribute('href', $requirement->file);
 			}
-			else
-			{
+			else {
 				//  obtain the source and see if it has content
 				$source = $requirement->value();
-				if (!empty($source))
-				{
+				if (!empty($source)) {
 					//  create a style element right before the offset element, minify the source and append it to the new element
 					$node = $offset->parentNode->insertBefore(
 						$dom->createElement('style', $this->call('/Source/Style/minify', $source)),

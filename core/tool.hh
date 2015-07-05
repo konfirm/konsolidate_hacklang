@@ -9,8 +9,7 @@
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  *  @note    This class is always available as soon as Konsolidate (and its extends) is instanced (and the Core tier is available)
  */
-class CoreTool<Konsolidate> extends Konsolidate
-{
+class CoreTool<Konsolidate> extends Konsolidate {
 	/**
 	 *  Determine whether the script is access from a POST request
 	 *  @name    isPosted
@@ -18,8 +17,7 @@ class CoreTool<Konsolidate> extends Konsolidate
 	 *  @access  public
 	 *  @return  bool
 	 */
-	public static function isPosted():bool
-	{
+	public function isPosted():bool {
 		return isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST';
 	}
 
@@ -34,10 +32,10 @@ class CoreTool<Konsolidate> extends Konsolidate
 	 *  @return  mixed
 	 *  @note    you can swap key and collection (Haystack - Needle)
 	 */
-	public static function arrVal(string $key, array<string, mixed> $collection, ?mixed $default):mixed
-	{
-		if (!is_array($collection) && is_array($key))
-			return CoreTool::arrVal($collection, $key, $default);
+	public function arrVal(string $key, array<string, mixed> $collection, ?mixed $default):mixed {
+		if (!is_array($collection) && is_array($key)) {
+			return $this->arrVal($collection, $key, $default);
+		}
 
 		return is_array($collection ) && isset($collection[$key]) ? $collection[$key] : $default;
 	}
@@ -53,11 +51,10 @@ class CoreTool<Konsolidate> extends Konsolidate
 	 *  @return  mixed
 	 *  @see     arrVal
 	 */
-	public static function arrayVal(string $key, array<string, mixed> $collection, ?mixed $default):mixed
-	{
-		return CoreTool::arrVal($key, $collection, $default);
+	public function arrayVal(string $key, array<string, mixed> $collection, ?mixed $default):mixed {
+		return $this->arrVal($key, $collection, $default);
 	}
-	
+
 	/**
 	 *  Get a value from a PHP Session (not a CoreSession!)
 	 *  @name    sesVal
@@ -68,9 +65,8 @@ class CoreTool<Konsolidate> extends Konsolidate
 	 *  @return  mixed
 	 *  @note    This method works with PHP's built in sessions (_SESSION global), not CoreSession!
 	 */
-	public static function sesVal(string $key, ?mixed $default):mixed
-	{
-		return CoreTool::arrVal($key, $_SESSION, $default);
+	public function sesVal(string $key, ?mixed $default):mixed {
+		return $this->arrVal($key, $_SESSION, $default);
 	}
 
 	/**
@@ -83,9 +79,8 @@ class CoreTool<Konsolidate> extends Konsolidate
 	 *  @return  mixed
 	 *  @see     sesVal
 	 */
-	public static function sessionVal(string $key, ?mixed $default):mixed
-	{
-		return CoreTool::sesVal($key, $default);
+	public function sessionVal(string $key, ?mixed $default):mixed {
+		return $this->sesVal($key, $default);
 	}
 
 	/**
@@ -97,9 +92,8 @@ class CoreTool<Konsolidate> extends Konsolidate
 	 *  @param   mixed  default [optional, default null]
 	 *  @return  mixed
 	 */
-	public static function cookieVal(string $key, ?mixed $default):mixed
-	{
-		return CoreTool::arrVal($key, $_COOKIE, $default);
+	public function cookieVal(string $key, ?mixed $default):mixed {
+		return $this->arrVal($key, $_COOKIE, $default);
 	}
 
 	/**
@@ -111,9 +105,8 @@ class CoreTool<Konsolidate> extends Konsolidate
 	 *  @param   mixed  default [optional, default null]
 	 *  @return  mixed
 	 */
-	public static function serverVal(string $key, $default=null):mixed
-	{
-		return CoreTool::arrVal($key, $_SERVER, $default);
+	public function serverVal(string $key, $default=null):mixed {
+		return $this->arrVal($key, $_SERVER, $default);
 	}
 
 	/**
@@ -125,9 +118,8 @@ class CoreTool<Konsolidate> extends Konsolidate
 	 *  @param   mixed  default [optional, default null]
 	 *  @return  mixed
 	 */
-	public static function envVal(string $key, $default=null):mixed
-	{
-		return CoreTool::arrVal($key, $_ENV, $default);
+	public function envVal(string $key, $default=null):mixed {
+		return $this->arrVal($key, $_ENV, $default);
 	}
 
 	/**
@@ -140,9 +132,8 @@ class CoreTool<Konsolidate> extends Konsolidate
 	 *  @return  mixed
 	 *  @see     envVal
 	 */
-	public static function environmentVal(string $key, ?mixed $default):mixed
-	{
-		return CoreTool::envVal($key, $default);
+	public function environmentVal(string $key, ?mixed $default):mixed {
+		return $this->envVal($key, $default);
 	}
 
 	/**
@@ -153,15 +144,15 @@ class CoreTool<Konsolidate> extends Konsolidate
 	 *  @param   mixed  default [optional, default null]
 	 *  @return  mixed
 	 */
-	public static function getIP(string $default='0.0.0.0'):string
-	{
-		if ($return = CoreTool::serverVal('HTTP_CLIENT_IP'))
-			return $return;
-		if ($return = CoreTool::serverVal('HTTP_X_FORWARDED_FOR'))
-			return $return;
-		if ($return = CoreTool::serverVal('REMOTE_ADDR'))
-			return $return;
-		return $default;
+	public function getIP(string $default='0.0.0.0'):string {
+		$result = null;
+		foreach (['HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR'] as $key) {
+			if (!$result) {
+				$result =$this->serverVal($key);
+			}
+		}
+
+		return $result ?: $default;
 	}
 
 	/**
@@ -174,15 +165,17 @@ class CoreTool<Konsolidate> extends Konsolidate
 	 *  @return  void
 	 *  @note    this method sends out both a META header and a JavaScript in case headers were already sent
 	 */
-	public static function redirect(string $URL, bool $die=true):void
-	{
-		if (!headers_sent())
+	public function redirect(string $URL, bool $die=true):void {
+		if (!headers_sent()) {
 			header('Location: ' . $URL);
-		else
+		}
+		else {
 			print('<meta http-equiv="refresh" content="0;URL=' . $URL . '"></meta>\n<script type="text/javascript">location.href="' . $URL . '";</script>');
-		
-		if ($die)
+		}
+
+		if ($die) {
 			exit;
+		}
 	}
 
 	/**
@@ -193,18 +186,21 @@ class CoreTool<Konsolidate> extends Konsolidate
 	 *  @param   int    timestamp [optional, default 946702800]
 	 *  @return  bool
 	 */
-	public static function expirePage(?int $timestamp):bool
-	{
-		if (!headers_sent())
-		{
-			if (is_null($timestamp))
+	public function expirePage(?int $timestamp):bool {
+		$result = false;
+
+		if (!headers_sent()) {
+			if (is_null($timestamp)) {
 				$timestamp = 946702800;
+			}
 			header('Cache-Control: no-cache, must-revalidate, private');
 			header('Pragma: no-cache');
 			header('Expires: ' . gmdate('D, d M Y H:i:s', $timestamp ) . ' GMT');
 			header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-			return true;
+
+			$result = true;
 		}
-		return false;
+
+		return $result;
 	}
 }

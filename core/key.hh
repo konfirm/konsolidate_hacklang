@@ -8,8 +8,7 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreKey<Konsolidate> extends Konsolidate
-{
+class CoreKey<Konsolidate> extends Konsolidate {
 	const CHAR    = 'abcdefghijklmnopqrstuvwxyz';
 	const NUMERIC = '0123456789';
 
@@ -70,8 +69,7 @@ class CoreKey<Konsolidate> extends Konsolidate
 	 *  @return  object
 	 *  @note    This object is constructed by one of Konsolidates modules
 	 */
-	public function __construct(Konsolidate $parent)
-	{
+	public function __construct(Konsolidate $parent) {
 		parent::__construct($parent);
 
 		$this->_exclude   = 'oO0iI1lzZ2sS5uUvVwWnNmMRQq';
@@ -91,11 +89,15 @@ class CoreKey<Konsolidate> extends Konsolidate
 	 *  @return  string generated key
 	 *  @note    string format uses XXXX-XXXX-XXXX, where X is replaced with a key part
 	 */
-	public function create(?string $format=''):string
-	{
-		if (empty($format))
+	public function create(?string $format=''):string {
+		if (empty($format)) {
 			$format = $this->_format;
-		return vsprintf(str_replace(Array('%', 'X'), Array('%%', '%s'), $format ), preg_split('//', substr(str_shuffle($this->_salt), 0, substr_count($format, 'X')), -1, PREG_SPLIT_NO_EMPTY));
+		}
+
+		return vsprintf(
+			str_replace(Array('%', 'X'), Array('%%', '%s'), $format ),
+			preg_split('//', substr(str_shuffle($this->_salt), 0, substr_count($format, 'X')), -1, PREG_SPLIT_NO_EMPTY)
+		);
 	}
 
 	/**
@@ -105,8 +107,7 @@ class CoreKey<Konsolidate> extends Konsolidate
 	 *  @access  protected
 	 *  @return  void
 	 */
-	protected function _createSalt():void
-	{
+	protected function _createSalt():void {
 		$this->_salt  = $this->_lowercase ? self::CHAR : '';
 		$this->_salt .= $this->_uppercase ? strToUpper(self::CHAR) : '';
 		$this->_salt .= $this->_numeric ? self::NUMERIC : '';
@@ -125,10 +126,8 @@ class CoreKey<Konsolidate> extends Konsolidate
 	 *  @note    reserved properties which actually change the 'salt' are: lowercase, uppercase, numeric, exclude and format and are treated as boolean values
 	 *           these reserved properties behave exactly as expected, except that they additionally modify the 'salt' the moment one of them is set
 	 */
-	public function __set($pty, $value):void
-	{
-		switch($pty)
-		{
+	public function __set($pty, $value):void {
+		switch($pty) {
 			case 'lowercase':
 			case 'uppercase':
 			case 'numeric':
@@ -137,6 +136,7 @@ class CoreKey<Konsolidate> extends Konsolidate
 				$pty = '_' . $pty;
 				$this->$pty = $value;
 				$this->_createSalt();
+
 			default:
 				parent::__set($pty, $value);
 				break;

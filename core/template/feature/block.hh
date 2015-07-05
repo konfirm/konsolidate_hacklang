@@ -7,8 +7,7 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreTemplateFeatureBlock<CoreTemplateFeature> extends CoreTemplateFeature
-{
+class CoreTemplateFeatureBlock<CoreTemplateFeature> extends CoreTemplateFeature {
 	protected DOMNode $_marker;
 	protected string $_data;
 	protected Vector<CoreTemplate> $_stack;
@@ -21,8 +20,7 @@ class CoreTemplateFeatureBlock<CoreTemplateFeature> extends CoreTemplateFeature
 	 *  @access public
 	 *  @return bool success
 	 */
-	public function prepare():bool
-	{
+	public function prepare():bool {
 		$this->_marker = $this->_node->parentNode->insertBefore(
 			$this->_getDOMDocument()->createComment('block \'' . $this->name . '\''),
 			$this->_node
@@ -30,8 +28,9 @@ class CoreTemplateFeatureBlock<CoreTemplateFeature> extends CoreTemplateFeature
 
 		$data = '';
 		$dom  = $this->_getDOMDocument();
-		foreach ($this->_node->childNodes as $child)
+		foreach ($this->_node->childNodes as $child) {
 			$data .= trim($dom->saveXML($child));
+		}
 		$this->_data = $data;
 
 		$this->_node->parentNode->removeChild($this->_node);
@@ -46,8 +45,7 @@ class CoreTemplateFeatureBlock<CoreTemplateFeature> extends CoreTemplateFeature
 	 *  @access public
 	 *  @return Template object
 	 */
-	public function duplicate():CoreTemplate
-	{
+	public function duplicate():CoreTemplate {
 		$instance = $this->instance('/Template');
 		$instance->load($this->_data, $this->_template);
 
@@ -61,8 +59,7 @@ class CoreTemplateFeatureBlock<CoreTemplateFeature> extends CoreTemplateFeature
 	 *  @access public
 	 *  @return bool success
 	 */
-	public function render():bool
-	{
+	public function render():bool {
 		$this->_renderStack();
 		$this->_marker->parentNode->removeChild($this->_marker);
 
@@ -78,10 +75,10 @@ class CoreTemplateFeatureBlock<CoreTemplateFeature> extends CoreTemplateFeature
 	 *  @return Template object
 	 *  @note   The given template object will also be prepared with some predefined variables
 	 */
-	protected function _addToStack(CoreTemplate $template):CoreTemplate
-	{
-		if (!$this->_stack)
+	protected function _addToStack(CoreTemplate $template):CoreTemplate {
+		if (!$this->_stack) {
 			$this->_stack = Vector<CoreTemplate> {};
+		}
 
 		$this->_stack->add($this->_getPopulatedTemplate($template, count($this->_stack)));
 
@@ -95,17 +92,16 @@ class CoreTemplateFeatureBlock<CoreTemplateFeature> extends CoreTemplateFeature
 	 *  @access protected
 	 *  @return void
 	 */
-	protected function _renderStack():void
-	{
+	protected function _renderStack():void {
 		if ($this->_stack)
-			foreach ($this->_stack as $template)
-			{
+			foreach ($this->_stack as $template) {
 				$dom = $template->render(true, true);
-				foreach ($dom->childNodes as $child)
+				foreach ($dom->childNodes as $child) {
 					$this->_marker->parentNode->insertBefore(
 						$this->_marker->ownerDocument->importNode($child, true),
 						$this->_marker
 					);
+				}
 			}
 	}
 
@@ -116,8 +112,7 @@ class CoreTemplateFeatureBlock<CoreTemplateFeature> extends CoreTemplateFeature
 	 *  @access protected
 	 *  @return Template object
 	 */
-	protected function _getPopulatedTemplate(CoreTemplate $template, int $index):CoreTemplate
-	{
+	protected function _getPopulatedTemplate(CoreTemplate $template, int $index):CoreTemplate {
 		$template->_position = $index;
 		$template->_parity   = $index % 2 == 0 ? 'even' : 'odd';
 		$template->_name     = $this->name;

@@ -7,8 +7,7 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreDBMySQLiException<Exception> extends Exception
-{
+class CoreDBMySQLiException<Exception> extends Exception {
 	/**
 	 *  The error message
 	 *  @name    error
@@ -35,16 +34,13 @@ class CoreDBMySQLiException<Exception> extends Exception
 	 *  @syntax  object = &new CoreDBMySQLiException( resource connection )
 	 *  @note    This object is constructed by CoreDBMySQLi as 'status report'
 	 */
-	public function __construct()
-	{
+	public function __construct() {
 		$arg = func_get_args();
-		if (count($arg) === 2)
-		{
+		if (count($arg) === 2) {
 			$this->error = $arg[0];
 			$this->errno = $arg[1];
 		}
-		else
-		{
+		else {
 			$connection = array_shift( $arg );
 			$this->error = $connection->error;
 			$this->errno = $connection->errno;

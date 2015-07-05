@@ -8,8 +8,7 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreDBMySQLiQuery<Konsolidate> extends Konsolidate
-{
+class CoreDBMySQLiQuery<Konsolidate> extends Konsolidate {
 	/**
 	 *  The connection resource
 	 *  @name    _conn
@@ -67,18 +66,19 @@ class CoreDBMySQLiQuery<Konsolidate> extends Konsolidate
 	 *  @param   MySQLi connection
 	 *  @returns void
 	 */
-	public function execute(string $query, MySQLi $connection):void
-	{
+	public function execute(string $query, MySQLi $connection):void {
 		$this->query    = $query;
 		$this->_conn    = $connection;
 		$start          = microtime(true);
 		$this->_result  = $this->_conn->query($this->query);
 		$this->duration = microtime(true) - $start;
 
-		if ($this->_result instanceof MySQLi_Result)
+		if ($this->_result instanceof MySQLi_Result) {
 			$this->rows = $this->_result->num_rows;
-		else if ($this->_result === true)
+		}
+		else if ($this->_result === true) {
 			$this->rows = $this->_conn->affected_rows;
+		}
 
 		//  We want the exception object to tell us everything is going extremely well, don't throw it!
 		$this->import('../exception.hh');
@@ -86,8 +86,9 @@ class CoreDBMySQLiQuery<Konsolidate> extends Konsolidate
 		$this->errno     = &$this->exception->errno;
 		$this->error     = &$this->exception->error;
 
-		if ($this->errno > 0)
+		if ($this->errno > 0) {
 			$this->call('/Log/write', __METHOD__ . ' failed: (' . $this->errno . ') ' . $this->error . PHP_EOL . '--> ' . $this->query, 2);
+		}
 	}
 
 	/**
@@ -97,10 +98,10 @@ class CoreDBMySQLiQuery<Konsolidate> extends Konsolidate
 	 *  @access  public
 	 *  @returns bool success
 	 */
-	public function rewind():bool
-	{
-		if ($this->_result instanceof MySQLi_Result && $this->_result->num_rows > 0)
+	public function rewind():bool {
+		if ($this->_result instanceof MySQLi_Result && $this->_result->num_rows > 0) {
 			return $this->_result->data_seek(0);
+		}
 
 		return false;
 	}
@@ -112,10 +113,10 @@ class CoreDBMySQLiQuery<Konsolidate> extends Konsolidate
 	 *  @access  public
 	 *  @returns object resultrow
 	 */
-	public function next():mixed
-	{
-		if ($this->_result instanceof MySQLi_Result)
+	public function next():mixed {
+		if ($this->_result instanceof MySQLi_Result) {
 			return $this->_result->fetch_object();
+		}
 
 		return false;
 	}
@@ -127,8 +128,7 @@ class CoreDBMySQLiQuery<Konsolidate> extends Konsolidate
 	 *  @access  public
 	 *  @returns int id
 	 */
-	public function lastInsertID():int
-	{
+	public function lastInsertID():int {
 		return $this->_conn->insert_id;
 	}
 
@@ -141,8 +141,7 @@ class CoreDBMySQLiQuery<Konsolidate> extends Konsolidate
 	 *  @note    alias for lastInsertID
 	 *  @see     lastInsertID
 	 */
-	public function lastId():int
-	{
+	public function lastId():int {
 		return $this->lastInsertID();
 	}
 
@@ -153,18 +152,19 @@ class CoreDBMySQLiQuery<Konsolidate> extends Konsolidate
 	 *  @access  public
 	 *  @returns array result
 	 */
-	public function fetchAll():array
-	{
+	public function fetchAll():array {
 		$return = Array();
-		while( $oRecord = $this->next() )
-			array_push( $return, $oRecord );
+
+		while($record = $this->next()) {
+			array_push($return, $record);
+		}
 		$this->rewind();
+
 		return $return;
 	}
 
-	public function __destruct()
-	{
-		if (is_resource( $this->_result))
+	public function __destruct():void {
+		if (is_resource($this->_result))
 			mysqli_free_result($this->_result);
 	}
 }

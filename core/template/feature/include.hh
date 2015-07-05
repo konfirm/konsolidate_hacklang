@@ -7,8 +7,7 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreTemplateFeatureInclude<CoreTemplateFeature> extends CoreTemplateFeature
-{
+class CoreTemplateFeatureInclude<CoreTemplateFeature> extends CoreTemplateFeature {
 	/**
 	 *  Do all preparations needed for the feature to do its deed
 	 *  @name   prepare
@@ -16,13 +15,11 @@ class CoreTemplateFeatureInclude<CoreTemplateFeature> extends CoreTemplateFeatur
 	 *  @access public
 	 *  @return bool success
 	 */
-	public function prepare():bool
-	{
+	public function prepare():bool {
 		$template = $this->instance('/Template', $this->file, $this->_template, false);
 		$dom = $template->getDOM();
 
-		foreach ($dom->documentElement->childNodes as $child)
-		{
+		foreach ($dom->documentElement->childNodes as $child) {
 			$this->_node->parentNode->insertBefore(
 				$this->_getDOMDocument()->importNode($child, true),
 				$this->_node

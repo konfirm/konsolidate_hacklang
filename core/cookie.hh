@@ -7,13 +7,11 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreCookie<Konsolidate> extends Konsolidate implements ArrayAccess
-{
+class CoreCookie<Konsolidate> extends Konsolidate implements ArrayAccess {
 	protected bool $_verify;
 
 
-	public function __construct(Konsolidate $parent)
-	{
+	public function __construct(Konsolidate $parent) {
 		parent::__construct($parent);
 
 		$this->_verify = $this->get('/Config/Cookie/verify', $this->get('/Config/Request/verify', true));
@@ -34,14 +32,12 @@ class CoreCookie<Konsolidate> extends Konsolidate implements ArrayAccess
 	 *  @param   bool     httpOnly (options, default false)
 	 *  @return  void
 	 */
-	public function set():void
-	{
+	public function set():void {
 		$argument  = func_get_args();
 		$property  = array_shift($argument);
 		$separator = strrpos($property, static::MODULE_SEPARATOR);
 
-		if ($separator !== false && ($instance = $this->getModule(substr($property, 0, $separator))) !== false)
-		{
+		if ($separator !== false && ($instance = $this->getModule(substr($property, 0, $separator))) !== false) {
 			array_unshift($argument, substr($property, $separator + 1));
 
 			return call_user_func_array(Array($instance, 'set'), $argument);
@@ -55,8 +51,9 @@ class CoreCookie<Konsolidate> extends Konsolidate implements ArrayAccess
 		$httpOnly = count($argument) ? array_shift($argument) : false;
 
 		$this->_removeCounterfit($property);
-		if (setCookie($property, $value, $expires, $path, $domain, $secure, $httpOnly))
+		if (setCookie($property, $value, $expires, $path, $domain, $secure, $httpOnly)) {
 			$this->_property[$property] = $value;
+		}
 
 		return $this->$property === $value;
 	}
@@ -70,8 +67,7 @@ class CoreCookie<Konsolidate> extends Konsolidate implements ArrayAccess
 	 *  @param   mixed  value
 	 *  @return  void
 	 */
-	public function __set(string $property, mixed $value):void
-	{
+	public function __set(string $property, mixed $value):void {
 		$this->_removeCounterfit($property);
 		setCookie($property, $value);
 
@@ -86,12 +82,10 @@ class CoreCookie<Konsolidate> extends Konsolidate implements ArrayAccess
 	 *  @param   string key
 	 *  @return  void
 	 */
-	public function __unset(string $property):void
-	{
+	public function __unset(string $property):void {
 		$this->_removeCounterfit($property);
 
-		if (isset($this->_property[$property]))
-		{
+		if (isset($this->_property[$property])) {
 			setCookie($property, '');
 			unset($this->_property[$property]);
 		}
@@ -104,11 +98,11 @@ class CoreCookie<Konsolidate> extends Konsolidate implements ArrayAccess
 	 *  @access  protected
 	 *  @return  void
 	 */
-	protected function _collect():void
-	{
+	protected function _collect():void {
 		$super = '_COOKIE';
-		if (isset($GLOBALS[$super]) && is_array($GLOBALS[$super]))
+		if (isset($GLOBALS[$super]) && is_array($GLOBALS[$super])) {
 			$this->_populate($GLOBALS[$super], $this->call('/Tool/serverVal', 'HTTP_COOKIE'));
+		}
 
 		$GLOBALS[$super] = $this;
 	}
@@ -122,10 +116,10 @@ class CoreCookie<Konsolidate> extends Konsolidate implements ArrayAccess
 	 *  @param   string  buffer (to verify against)
 	 *  @return  void
 	 */
-	protected function _populate(array $collection, ?string $buffer=null):void
-	{
-		foreach ($collection as $key=>$value)
+	protected function _populate(array $collection, ?string $buffer=null):void {
+		foreach ($collection as $key=>$value) {
 			$this->_property[$key] = $this->_verify ? $this->call('/Input/Verify/bufferValue', $buffer, $key, $value, ';', false) : $value;
+		}
 	}
 
 	/**
@@ -138,34 +132,32 @@ class CoreCookie<Konsolidate> extends Konsolidate implements ArrayAccess
 	 *  @param   string  property
 	 *  @return  void
 	 */
-	protected function _removeCounterfit(string $property):void
-	{
-		if (strpos($property, '_') !== false && preg_match_all('/(' . str_replace('_', '[\[_]', $property) . ')=[^;]*/', $this->call('/Tool/serverVal', 'HTTP_COOKIE'), $match))
-			foreach ($match[1] as $pattern)
-				if ($pattern !== $property)
+	protected function _removeCounterfit(string $property):void {
+		if (strpos($property, '_') !== false && preg_match_all('/(' . str_replace('_', '[\[_]', $property) . ')=[^;]*/', $this->call('/Tool/serverVal', 'HTTP_COOKIE'), $match)) {
+			foreach ($match[1] as $pattern) {
+				if ($pattern !== $property) {
 					setCookie($pattern, '');
+				}
+			}
+		}
 	}
 
 
 
 	/*  ArrayAccess implementation */
-	public function offsetGet(mixed $offset):mixed
-	{
+	public function offsetGet(mixed $offset):mixed {
 		return $this->{$offset};
 	}
 
-	public function offsetSet(mixed $offset, mixed $value):mixed
-	{
+	public function offsetSet(mixed $offset, mixed $value):mixed {
 		return $this->{$offset} = $value;
 	}
 
-	public function offsetExists(mixed $offset):mixed
-	{
+	public function offsetExists(mixed $offset):mixed {
 		return isset($this->{$offset});
 	}
 
-	public function offsetUnset(mixed $offset):mixed
-	{
+	public function offsetUnset(mixed $offset):mixed {
 		unset($this->{$offset});
 	}
 }

@@ -7,8 +7,7 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreTemplateGroup<Konsolidate> extends Konsolidate
-{
+class CoreTemplateGroup<Konsolidate> extends Konsolidate {
 	protected Vector<CoreTemplateFeature> $_group;
 
 
@@ -21,8 +20,7 @@ class CoreTemplateGroup<Konsolidate> extends Konsolidate
 	 *  @param  Array feature group
 	 *  @return CoreTemplateGroup object
 	 */
-	public function __construct(Konsolidate $parent, Vector<CoreTemplateFeature> $group=null)
-	{
+	public function __construct(Konsolidate $parent, Vector<CoreTemplateFeature> $group=null) {
 		parent::__construct($parent);
 
 		$this->_group = $group;
@@ -37,10 +35,10 @@ class CoreTemplateGroup<Konsolidate> extends Konsolidate
 	 *  @param  mixed argument
 	 *  @return void
 	 */
-	public function __call(string $method, Array<string, mixed> $argument):void
-	{
-		foreach ($this->_group as $member)
+	public function __call(string $method, Array<string, mixed> $argument):void {
+		foreach ($this->_group as $member) {
 			call_user_func_array(Array($member, $method), $argument);
+		}
 	}
 
 	/**
@@ -51,11 +49,12 @@ class CoreTemplateGroup<Konsolidate> extends Konsolidate
 	 *  @param  string name
 	 *  @return CoreTemplateGroup object
 	 */
-	public function block(string $name):CoreTemplateGroup
-	{
+	public function block(string $name):CoreTemplateGroup {
 		$return = Array();
-		foreach ($this->_group as $member)
+		foreach ($this->_group as $member) {
 			$return[] = $member->block($name);
+		}
+
 		return count($return) > 0 ? $this->instance('../Group', $return) : false;
 	}
 
@@ -68,10 +67,10 @@ class CoreTemplateGroup<Konsolidate> extends Konsolidate
 	 *  @param  mixed value
 	 *  @return void
 	 */
-	public function __set(string $property, mixed $value):void
-	{
-		foreach ($this->_group as $member)
+	public function __set(string $property, mixed $value):void {
+		foreach ($this->_group as $member) {
 			$member->{$property} = $value;
+		}
 	}
 
 
@@ -83,10 +82,11 @@ class CoreTemplateGroup<Konsolidate> extends Konsolidate
 	 *  @param  string property
 	 *  @return mixed value
 	 */
-	public function __get(string $property):mixed
-	{
-		foreach ($this->_group as $member)
-			if (isset($member->{$property}))
+	public function __get(string $property):mixed {
+		foreach ($this->_group as $member) {
+			if (isset($member->{$property})) {
 				return $member->{$property};
+			}
+		}
 	}
 }

@@ -8,8 +8,7 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreTemplateFeatureScript<CoreTemplateFeature> extends CoreTemplateFeature
-{
+class CoreTemplateFeatureScript<CoreTemplateFeature> extends CoreTemplateFeature {
 	/**
 	 *  Render the feature
 	 *  @name   render
@@ -17,21 +16,20 @@ class CoreTemplateFeatureScript<CoreTemplateFeature> extends CoreTemplateFeature
 	 *  @access public
 	 *  @return bool success
 	 */
-	public function render():bool
-	{
+	public function render():bool {
 		$files    = Map<string, bool> {};
 		$requires = $this->_template->getFeatures('require', Array('type'=>'text/javascript'), true);
 		$dom      = $this->_getDOMDocument();
 
-		foreach ($requires as $requirement)
-		{
+		foreach ($requires as $requirement) {
 			//  requirements referencing an external file will be included only once unless the multiple="true" attribute is set
-			if (isset($requirement->file))
-			{
-				if ($files->contains($requirement->file) && $requirement->multiple !== 'true')
+			if (isset($requirement->file)) {
+				if ($files->contains($requirement->file) && $requirement->multiple !== 'true') {
 					continue;
-				else
+				}
+				else {
 					$files->add(Pair {$requirement->file, true});
+				}
 			}
 
 			//  if the require feature has been fixated (either the template author added an attribute fixate="true" or
@@ -48,18 +46,14 @@ class CoreTemplateFeatureScript<CoreTemplateFeature> extends CoreTemplateFeature
 			$node->setAttribute('type', 'text/javascript');
 
 			//  if the requirement has the file property, we need to reference it differently
-			if (isset($requirement->file))
-			{
+			if (isset($requirement->file)) {
 				$node->setAttribute('src', $requirement->file);
 				$node->appendChild($dom->createTextNode(''));
 			}
-			else
-			{
+			else {
 				$source = $requirement->value();
-				if (!empty($source))
-				{
+				if (!empty($source)) {
 					//  minify the source and append it to the new element
-//					$source = trim($this->call('/Source/Script/minify', $source), ';');
 					$node->appendChild($dom->createCDATASection($source));
 				}
 			}

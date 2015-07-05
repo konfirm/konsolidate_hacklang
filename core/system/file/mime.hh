@@ -7,8 +7,7 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreSystemFileMIME<Konsolidate> extends Konsolidate
-{
+class CoreSystemFileMIME<Konsolidate> extends Konsolidate {
 	/**
 	 *  Try to determine the MIME type of a file
 	 *  @name    getType
@@ -17,16 +16,16 @@ class CoreSystemFileMIME<Konsolidate> extends Konsolidate
 	 *  @param   string filename
 	 *  @return  string MIME
 	 */
-	public function getType(string $file):string
-	{
+	public function getType(string $file):string {
 		$method = '_determineTypeByExtension';
 
-		if (file_exists($file))
-		{
-			if (function_exists('finfo_open'))
+		if (file_exists($file)) {
+			if (function_exists('finfo_open')) {
 				$method = '_determineTypeByFileInfo';
-			else if (function_exists('mime_content_type'))
+			}
+			else if (function_exists('mime_content_type')) {
 				$method = '_determineTypeByMimeContentType';
+			}
 		}
 
 		return $this->{$method}($file);
@@ -40,8 +39,7 @@ class CoreSystemFileMIME<Konsolidate> extends Konsolidate
 	 *  @param   string filename
 	 *  @return  string MIME
 	 */
-	protected function _determineTypeByMimeContentType(string $file):string
-	{
+	protected function _determineTypeByMimeContentType(string $file):string {
 		return mime_content_type($file);
 	}
 
@@ -53,8 +51,7 @@ class CoreSystemFileMIME<Konsolidate> extends Konsolidate
 	 *  @param   string filename
 	 *  @return  string MIME
 	 */
-	protected function _determineTypeByFileInfo(string $file):string
-	{
+	protected function _determineTypeByFileInfo(string $file):string {
 		$finfo    = finfo_open(FILEINFO_MIME, $this->get('/Config/finfo_open/magic_file', null));
 		$mimetype = finfo_file($finfo, $file);
 		finfo_close($finfo);
@@ -71,14 +68,12 @@ class CoreSystemFileMIME<Konsolidate> extends Konsolidate
 	 *  @param   string filename
 	 *  @returns string MIME
 	 */
-	protected function _determineTypeByExtension($file)
-	{
+	protected function _determineTypeByExtension($file) {
 		$part      = explode('.', $file);
 	    $extension = array_pop($part);
 	    $result    = 'application/octet-stream';
 
-		switch (strToLower($extension))
-		{
+		switch (strToLower($extension)) {
 			//  Common image types
 			case 'ai':
 			case 'eps':

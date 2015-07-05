@@ -7,8 +7,7 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreRequestFile<Konsolidate> extends Konsolidate
-{
+class CoreRequestFile<Konsolidate> extends Konsolidate {
 	/**
 	 *  Move the uploaded file to target destination
 	 *  @name    move
@@ -18,22 +17,17 @@ class CoreRequestFile<Konsolidate> extends Konsolidate
 	 *  @param   bool    safe name [optional, default true]
 	 *  @return  bool
 	 */
-	public function move(string $destination, bool $useSanitizedName=true):bool
-	{
-		if (is_uploaded_file($this->tmp_name))
-		{
-			if (is_dir(realpath($destination)))  //  only directory provided, appending filename to it
-			{
+	public function move(string $destination, bool $useSanitizedName=true):bool {
+		if (is_uploaded_file($this->tmp_name)) {
+			if (is_dir(realpath($destination)))  //  only directory provided, appending filename to it {
 				$destination = realpath($destination) . '/' . ($useSanitizedName ? $this->sanitizedname : $this->name);
 			}
-			else if (!strstr(basename($destination), '.'))  //  assuming a dot in every filename... possible weird side effects?
-			{
+			else if (!strstr(basename($destination), '.'))  //  assuming a dot in every filename... possible weird side effects? {
 				mkdir($destination, 0777, true);
 				$destination = realpath($destination) . '/' . ($useSanitizedName ? $this->sanitizedname : $this->name);
 			}
 
-			if (move_uploaded_file($this->tmp_name, $destination))
-			{
+			if (move_uploaded_file($this->tmp_name, $destination)) {
 				unset($this->_property['tmp_name']);
 				$this->location = $destination;
 				return true;
@@ -56,13 +50,10 @@ class CoreRequestFile<Konsolidate> extends Konsolidate
 	 *           - 'tmp_name' also sets 'md5', the MD5 checksum of the file.
 	 *           - 'size' also sets 'filesize', a human readable representation of the file size.
 	 */
-	public function __set(string $key, mixed $value):void
-	{
-		if (!empty($value) || $key == 'error')
-		{
+	public function __set(string $key, mixed $value):void {
+		if (!empty($value) || $key == 'error') {
 			parent::__set($key, $value);
-			switch ($key)
-			{
+			switch ($key) {
 				case 'error':
 					$this->_property['message'] = $this->_getErrorMessage($value);
 					$this->_property['success'] = $value == UPLOAD_ERR_OK;
@@ -92,15 +83,14 @@ class CoreRequestFile<Konsolidate> extends Konsolidate
 	 *  @param   int     bytes
 	 *  @return  string  readable unit
 	 */
-	protected function _bytesToLargestUnit(int $value):string
-	{
+	protected function _bytesToLargestUnit(int $value):string {
 		$result = $value . ' bytes';
-		foreach (Array('KB', 'MB', 'GB', 'TB', 'PB') as $unit)
-			if ($value >= 1024)
-			{
+		foreach (Array('KB', 'MB', 'GB', 'TB', 'PB') as $unit) {
+			if ($value >= 1024) {
 				$value /= 1024;
 				$result  = (round($value * 10) / 10) . $unit;
 			}
+		}
 
 		return $result;
 	}
@@ -113,12 +103,10 @@ class CoreRequestFile<Konsolidate> extends Konsolidate
 	 *  @param   int     error number
 	 *  @return  string  error message
 	 */
-	protected function _getErrorMessage(int $error):string
-	{
+	protected function _getErrorMessage(int $error):string {
 		$result = 'Unknown error';
 
-		switch ($error)
-		{
+		switch ($error) {
 			case UPLOAD_ERR_OK:
 				$result = 'No error';
 				break;

@@ -7,8 +7,7 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreDB<Konsolidate> extends Konsolidate
-{
+class CoreDB<Konsolidate> extends Konsolidate {
 	/**
 	 *  The database/connection pool
 	 *  @name    _pool
@@ -35,8 +34,7 @@ class CoreDB<Konsolidate> extends Konsolidate
 	 *  @return  object
 	 *  @note    This object is constructed by one of Konsolidates modules
 	 */
-	public function __construct($parent)
-	{
+	public function __construct($parent) {
 		parent::__construct($parent);
 
 		$this->_pool    = Array();
@@ -54,18 +52,19 @@ class CoreDB<Konsolidate> extends Konsolidate
 	 *  @note    the URI is formatted like: scheme://user:pass@host[:port]/database
 	 *           providing an unique reference provides you to ability to use more than one connection
 	 */
-	public function setConnection(string $reference, string $dsn):bool
-	{
+	public function setConnection(string $reference, string $dsn):bool {
 		$reference = strToUpper($reference);
 		$uri       = parse_url($dsn);
 
-		if ($this->_default === false)
+		if ($this->_default === false) {
 			$this->_default = $reference;
-		
+		}
+
 		$this->_pool[$reference] = $this->instance($uri['scheme']);
 
-		if (is_object($this->_pool[$reference]))
+		if (is_object($this->_pool[$reference])) {
 			return $this->_pool[$reference]->setConnection($dsn, true);
+		}
 
 		return false;
 	}
@@ -80,12 +79,12 @@ class CoreDB<Konsolidate> extends Konsolidate
 	 *  @note    By default the first connection will be the default connection, a call to the setDefaultConnection
 	 *           is only required if you want to change this behaviour
 	 */
-	public function setDefaultConnection(string $reference):mixed
-	{
+	public function setDefaultConnection(string $reference):mixed {
 		$reference = strToUpper($reference);
 
-		if (isset($this->_pool[$reference]) && is_object($this->_pool[$reference]))
+		if (isset($this->_pool[$reference]) && is_object($this->_pool[$reference])) {
 			return $this->_default = $reference;
+		}
 
 		return false;
 	}
@@ -97,10 +96,10 @@ class CoreDB<Konsolidate> extends Konsolidate
 	 *  @access  public
 	 *  @return  bool
 	 */
-	public function connect():bool
-	{
-		if (isset($this->_pool[$this->_default]) && is_object($this->_pool[$this->_default]))
+	public function connect():bool {
+		if (isset($this->_pool[$this->_default]) && is_object($this->_pool[$this->_default])) {
 			return $this->_pool[$this->_default]->connect();
+		}
 
 		return false;
 	}
@@ -113,10 +112,10 @@ class CoreDB<Konsolidate> extends Konsolidate
 	 *  @param   string reference
 	 *  @return  bool
 	 */
-	public function isConnected():bool
-	{
-		if (isset($this->_pool[$this->_default]) && is_object($this->_pool[$this->_default]))
+	public function isConnected():bool {
+		if (isset($this->_pool[$this->_default]) && is_object($this->_pool[$this->_default])) {
 			return $this->_pool[$this->_default]->isConnected();
+		}
 
 		return false;
 	}
@@ -129,21 +128,24 @@ class CoreDB<Konsolidate> extends Konsolidate
 	 *  @param   string reference (optional, default only the connection marked as 'default')
 	 *  @return  bool
 	 */
-	public function disconnect(mixed $reference=false):bool
-	{
-		if ($reference === true)
-		{
+	public function disconnect(mixed $reference=false):bool {
+		if ($reference === true) {
 			$result = true;
-			if ($this->_connected)
-				foreach($this->_pool as $key=>$db)
+			if ($this->_connected) {
+				foreach($this->_pool as $key=>$db) {
 					$result &= $db->disconnect();
+				}
+			}
+
 			return $result;
 		}
-		else if ($reference === false)
+		else if ($reference === false) {
 			$reference = $this->_default;
+		}
 
-		if (isset($this->_pool[$this->_default]) && is_object($this->_pool[$reference]))
+		if (isset($this->_pool[$this->_default]) && is_object($this->_pool[$reference])) {
 			return $this->_pool[$this->_default]->disconnect();
+		}
 
 		return false;
 	}
@@ -159,10 +161,10 @@ class CoreDB<Konsolidate> extends Konsolidate
 	 *  @note    the optional cache is per pageview and in memory only, it merely prevents
 	 *           executing the exact same query over and over again
 	 */
-	public function query(string $query, bool $useCache=true):mixed
-	{
-		if ($this->_default && isset($this->_pool[$this->_default]) && is_object($this->_pool[$this->_default]))
+	public function query(string $query, bool $useCache=true):mixed {
+		if ($this->_default && isset($this->_pool[$this->_default]) && is_object($this->_pool[$this->_default])) {
 			return $this->_pool[$this->_default]->query($query, $useCache);
+		}
 
 		return false;
 	}
@@ -176,11 +178,11 @@ class CoreDB<Konsolidate> extends Konsolidate
 	 *  @param   string module/connection
 	 *  @return  Object
 	 */
-	public function register(string $module):Konsolidate
-	{
+	public function register(string $module):Konsolidate {
 		$reference = strToUpper($module);
-		if (is_array($this->_pool) && array_key_exists($reference, $this->_pool) && is_object($this->_pool[$reference]))
+		if (is_array($this->_pool) && array_key_exists($reference, $this->_pool) && is_object($this->_pool[$reference])) {
 			return $this->_pool[$reference];
+		}
 
 		return parent::register($module);
 	}
@@ -191,8 +193,7 @@ class CoreDB<Konsolidate> extends Konsolidate
 	 *  @type    method
 	 *  @access  public
 	 */
-	public function __destruct():void
-	{
+	public function __destruct():void {
 		$this->disconnect(true);
 	}
 
@@ -206,25 +207,25 @@ class CoreDB<Konsolidate> extends Konsolidate
 	 *  @note    By default all calls which are not defined in this class are bridged to the default connection
 	 *  @see     setDefaultConnection
 	 */
-	public function __call(string $method, array $arg):mixed
-	{
+	public function __call(string $method, array $arg):mixed {
 		//  Get the first argument, which could be a reference to a pool item
 		$reference = (string) array_shift($arg);
 
 		//  In case the first argument was not a pool item, put the first argument back in refer to the master
-		if (!array_key_exists($reference, $this->_pool))
-		{
+		if (!array_key_exists($reference, $this->_pool)) {
 			array_unshift($arg, $reference);
 			$reference = $this->_default;
 		}
 
-		if (method_exists($this->_pool[$reference], $method))
+		if (method_exists($this->_pool[$reference], $method)) {
 			return call_user_func_array(Array(
                     $this->_pool[$reference], // the database object
 					$method                    // the method
                 ),
 				$arg                    // the arguments
             );
+		}
+
 		return parent::__call($method, $arg);
 	}
 }
