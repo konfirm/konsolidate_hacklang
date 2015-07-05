@@ -7,8 +7,7 @@
  *  @package Konsolidate
  *  @author  Rogier Spieker <rogier@konsolidate.nl>
  */
-class CoreTemplateFeature<Konsolidate> extends Konsolidate
-{
+class CoreTemplateFeature<Konsolidate> extends Konsolidate {
 	protected DOMNode $_node;
 	protected DOMNode $_placeholder;
 	protected CoreTemplate $_template;
@@ -23,18 +22,19 @@ class CoreTemplateFeature<Konsolidate> extends Konsolidate
 	 *  @param  DOMNode      node
 	 *  @param  CoreTemplate template
 	 */
-	public function __construct(Konsolidate $parent, DOMNode $node=null, CoreTemplate $template=null)
-	{
+	public function __construct(Konsolidate $parent, DOMNode $node=null, CoreTemplate $template=null) {
 		parent::__construct($parent);
 
-		if (!empty($node))
-		{
+		if (!empty($node)) {
 			$this->_node = $node;
-			foreach ($this->getAttributes() as $key=>$value)
+			foreach ($this->getAttributes() as $key=>$value) {
 				$this->{$key} = $value;
+			}
 		}
-		if (!empty($template))
+
+		if (!empty($template)) {
 			$this->_template = $template;
+		}
 	}
 
 	/**
@@ -44,8 +44,7 @@ class CoreTemplateFeature<Konsolidate> extends Konsolidate
 	 *  @access public
 	 *  @return bool success
 	 */
-	public function prepare():bool
-	{
+	public function prepare():bool {
 		return true;
 	}
 
@@ -56,11 +55,13 @@ class CoreTemplateFeature<Konsolidate> extends Konsolidate
 	 *  @access public
 	 *  @return bool success
 	 */
-	public function render():bool
-	{
-		if (get_class($this) === __CLASS__)
+	public function render():bool {
+		if (get_class($this) === __CLASS__) {
 			$this->_renderDummy();
+		}
+
 		$this->_clean();
+
 		return true;
 	}
 
@@ -71,8 +72,7 @@ class CoreTemplateFeature<Konsolidate> extends Konsolidate
 	 *  @access public
 	 *  @return string node value
 	 */
-	public function value():string
-	{
+	public function value():string {
 		return $this->_node->nodeValue;
 	}
 
@@ -83,8 +83,7 @@ class CoreTemplateFeature<Konsolidate> extends Konsolidate
 	 *  @access public
 	 *  @return DOMNode node
 	 */
-	public function node():DOMNode
-	{
+	public function node():DOMNode {
 		return $this->_node;
 	}
 
@@ -95,8 +94,7 @@ class CoreTemplateFeature<Konsolidate> extends Konsolidate
 	 *  @access public
 	 *  @return DOMNode
 	 */
-	public function offsetNode():DOMNode
-	{
+	public function offsetNode():DOMNode {
 		return $this->_placeholder ? $this->_placeholder : $this->_node;
 	}
 
@@ -109,10 +107,11 @@ class CoreTemplateFeature<Konsolidate> extends Konsolidate
 	 *  @param  string value (default null, if not null the value is set for the attribute)
 	 *  @return string attribute value
 	 */
-	public function attribute(string $name, string $value=null):?string
-	{
-		if (!is_null($value))
+	public function attribute(string $name, string $value=null):?string {
+		if (!is_null($value)) {
 			$this->_node->setAttribute($name, $value);
+		}
+
 		return $this->_node->hasAttribute($name) ? $this->_node->getAttribute($name) : null;
 	}
 
@@ -123,13 +122,13 @@ class CoreTemplateFeature<Konsolidate> extends Konsolidate
 	 *  @access public
 	 *  @return Map attributes
 	 */
-	public function getAttributes():Map
-	{
-		$return = Map {};
-		foreach ($this->_node->attributes as $attribute)
-			$return[$attribute->nodeName] = $attribute->nodeValue;
+	public function getAttributes():Map {
+		$result = Map {};
+		foreach ($this->_node->attributes as $attribute) {
+			$result[$attribute->nodeName] = $attribute->nodeValue;
+		}
 
-		return $return;
+		return $result;
 	}
 
 	/**
@@ -140,13 +139,14 @@ class CoreTemplateFeature<Konsolidate> extends Konsolidate
 	 *  @param  string property
 	 *  @return mixed value
 	 */
-	public function __get(string $property):mixed
-	{
-		$return = parent::__get($property);
-		if (!$return)
-			$return = $this->attribute($property);
+	public function __get(string $property):mixed {
+		$result = parent::__get($property);
 
-		return $return;
+		if (!$result) {
+			$result = $this->attribute($property);
+		}
+
+		return $result;
 	}
 
 	/**
@@ -156,10 +156,10 @@ class CoreTemplateFeature<Konsolidate> extends Konsolidate
 	 *  @access protected
 	 *  @return DOMDocument
 	 */
-	protected function _getDOMDocument():?DOMDocument
-	{
-		if ($this->_node instanceof DOMNode && $this->_node->ownerDocument)
+	protected function _getDOMDocument():?DOMDocument {
+		if ($this->_node instanceof DOMNode && $this->_node->ownerDocument) {
 		 	return $this->_node->ownerDocument;
+		 }
 	}
 
 	/**
@@ -169,10 +169,8 @@ class CoreTemplateFeature<Konsolidate> extends Konsolidate
 	 *  @access protected
 	 *  @return void
 	 */
-	protected function _clean():void
-	{
-		if ($this->_node->parentNode)
-		{
+	protected function _clean():void {
+		if ($this->_node->parentNode) {
 			$dom = $this->_getDOMDocument();
 			$this->_placeholder = $this->_node->parentNode->insertBefore(
 				$dom->createTextNode(''),
@@ -189,50 +187,49 @@ class CoreTemplateFeature<Konsolidate> extends Konsolidate
 	 *  @access  protected
 	 *  @return  void
 	 */
-	protected function _renderDummy():void
-	{
-		$dom  = $this->_getDOMDocument();
-		$name = $this->_node->localName;
-		$info = $this->_node->parentNode->insertBefore(
-			$dom->createElement('div'),
-			$this->_node
-		);
-		$info->setAttribute('style', 'border: 1px solid #900; background-color: #fd9; color: #900; margin: 20px; border-radius: 10px;');
-		$info->appendChild($dom->createElement('h2', 'Unknown template feature: ' . $name));
+	protected function _renderDummy():void {
+//		$source = '<div style="{style}"><h2>Unknown template feature: {name}</h2><div><h4>Origin</h4><p>The template containing the feature is: <pre>{origin}</pre></p><p>The feature code: <code>{source}</code></p></div><div><h4>Paths</h4><p>The feature was expected to be in one of the following paths:</p><ul><k:block name="path"><li>class <strong>{className}</strong> in {pathName}</li></k:block></ul></div><div><h4>Where to go from here</h4><p>Assuming the feature XML-syntax is correct, you now need to create its implementation class, this should be (one of):</p><ul><k:block name="suggest"><li><code>class {className} extends {extend}</code> in {pathName}</li></k:block></ul></div></div>';
+		$source = '<div style="{style}"><h2>Unknown template feature: {name}</h2><div><h4>Origin</h4><p>The template containing the feature is: <pre>{origin}</pre></p><p>The feature code: <code>{source}</code></p></div></div>';
 
-		//  describe from where the feature request originated
-		$origin = $info->appendChild($dom->createElement('div'));
-		$origin->appendChild($dom->createElement('h4', 'Origin'));
-		$origin->appendChild($dom->createElement('p', 'The template where the feature was called from is:'));
-		$origin->appendChild($dom->createElement('code', $this->_template->origin));
-		$origin->appendChild($dom->createElement('p', 'The exact feature syntax is:'));
-		$origin->appendChild($dom->createElement('code', $dom->saveXML($this->_node)));
+		$dom      = $this->_getDOMDocument();
+		$name     = $this->_node->localName;
+		$template = $this->instance('/Template', $source);
+		$suggest  = true;
 
-		//  describe where we've looked for the corresponding file
-		$search = $info->appendChild($dom->createElement('div'));
-		$search->appendChild($dom->createElement('h4', 'Paths'));
-		$search->appendChild($dom->createElement('p', 'The feature was not found in the project libraries, expected one of:'));
-		$list = $search->appendChild($dom->createElement('ul'));
+		$template->style  = 'font-family: sans-serif; font-size: 1em; line-height: 1.3em; border: 1px solid #4e342e; background-color: #ffab00; color: #4e342e; margin: 10px; padding: 10px;';
+		$template->name   = $name;
+		$template->origin = $this->_template->origin;
+		$template->source = $dom->saveXML($this->_node);
+/*
+		foreach ($this->getFilePath() as $tier=>$path) {
+			$className    = $tier . ucFirst($name);
+			$pathName     = $path . '/' . $name . static::FILE_EXTENSION;
+			$pathBlock    = $template->block('path');
 
-		foreach ($this->getFilePath() as $tier=>$path)
-		{
-			$item = $list->appendChild($dom->createElement('li'));
-			$item->appendChild($dom->createTextNode('class '));
-			$item->appendChild($dom->createElement('strong', $tier . ucFirst($name)));
-			$item->appendChild($dom->createTextNode(' in ' . $path . '/' . $name . '.class.php'));
+			//  prevent suggestions to add any features to the core
+			if ($suggest && preg_match('/^(?:core)/i', $tier)) {
+				$suggest = false;
+			}
+
+			if ($pathBlock) {
+				$pathBlock->className = $className;
+				$pathBlock->pathName  = $pathName;
+			}
+
+			if ($suggest) {
+				$suggestBlock = $template->block('suggest');
+				if ($suggestBlock) {
+					$suggestBlock->className = $className;
+					$suggestBlock->pathName  = $pathName;
+					$suggestBlock->extend    = __CLASS__;
+				}
+			}
 		}
-
-		$create = $info->appendChild($dom->createElement('div'));
-		$create->appendChild($dom->createElement('h4', 'Where to go from here'));
-		$create->appendChild($dom->createElement('p', 'Assuming the syntax of the feature is correct, you now need to create a feature implementation class, this should be (one of):'));
-		$list = $create->appendChild($dom->createElement('ul'));
-		foreach ($this->getFilePath() as $tier=>$path)
-		{
-			if (strpos($tier, 'Scaffold') === 0)
-				break;
-			$item = $list->appendChild($dom->createElement('li'));
-			$item->appendChild($dom->createElement('code', 'class ' . $tier . ucFirst($name) . ' extends ' . __CLASS__));
-			$item->appendChild($dom->createTextNode(' in ' . $path . '/' . $name . '.class.php'));
+*/
+		//  render the template into a DOMDocument
+		if ($this->_node->parentNode) {
+			$document = $template->render(true, true);
+			$this->_node->parentNode->insertBefore($dom->importNode($document->documentElement, true), $this->_node);
 		}
 	}
 }
