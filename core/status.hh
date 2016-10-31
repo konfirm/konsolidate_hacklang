@@ -711,6 +711,13 @@ class CoreStatus<Konsolidate> extends Konsolidate {
 		//  Miscellanious Status Codes
 		//  https://tools.ietf.org/html/draft-tbray-http-legally-restricted-status-00
 		static $misc = ImmMap<int, string> {
+			/**  1xx  -  Informational  **/
+
+			//  This informational status code indicates the client that the server
+		    //  is likely to send a final request with the headers included in the
+		    //  informational response.
+			103 => 'Early Hints',
+
 			/**  4xx  -  User Error  **/
 
 			//  This status code indicates that the server is subject to legal restrictions which prevent it
